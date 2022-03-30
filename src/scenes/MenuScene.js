@@ -1,15 +1,20 @@
 import Scene from "muffin-game/scenes/Scene";
-import { addNewMenuButtonsToScene, ExampleSceneList } from "muffin-game/scenes/MenuScene"
+import { addNewMenuButtonsToScene } from "muffin-game/scenes/MenuScene"
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import WorldScene from "./WorldScene";
+import HelpScene from "./HelpScene";
 
 
 export default class MyMenuScene extends Scene {
-    sceneList = [[WorldScene, "Start Game"]];
+    sceneList = [
+        [WorldScene, "Start Game"],
+        [HelpScene, "How to Play"],
+    ];
 
     constructor(game, options) {
         super(game, options);
         addNewMenuButtonsToScene(this);
+        this.buttons[0].y -= 50;
         this.actors.fuel = game.sprites.fuel();
         this.actors.fuel.x = game.width / 2;
         this.actors.fuel.y = (game.height - this.actors.fuel.height) - 50;

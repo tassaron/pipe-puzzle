@@ -1,8 +1,8 @@
 import { createGame, getTexture } from "muffin-game/core/setuptools";
 import Actor from "muffin-game/actors/Actor";
 import AnimatedActor from 'muffin-game/actors/AnimatedActor';
-import TileActor from "muffin-game/actors/TileActor";
-import MyMenuScene from "./MenuScene";
+import PipeTileActor from "./actors/PipeTileActor";
+import MyMenuScene from "./scenes/MenuScene";
 
 
 const textures = [
@@ -20,7 +20,7 @@ function afterPreload(loader, resources, sprites) {
     sprites.explosion = (game) => new AnimatedActor(game, getTexture(resources.explosion.texture, "explosion"), 32, 32, 5, 4);
 
     // tilemap
-    sprites.pipe = (game) => new TileActor(game, getTexture(resources.pipes.texture, "pipes"), 4, 4, 73);
+    sprites.pipe = (game) => new PipeTileActor(game, getTexture(resources.pipes.texture, "pipes"));
 };
 
 
