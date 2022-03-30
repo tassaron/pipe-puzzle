@@ -1,0 +1,33 @@
+{
+  "name": "your-game-name-here",
+  "version": "0.0.3",
+  "description": "A game created using the muffin-game template",
+  "main": "src/setup.js",
+  "root": "src",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --progress --mode=development --config webpack.config.js",
+    "build": "webpack --progress --mode=production --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tassaron/muffin-game-js.git"
+  },
+  "keywords": [
+    "videogame"
+  ],
+  "author": "tassaron",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tassaron/muffin-game-js/issues"
+  },
+  "homepage": "https://github.com/tassaron/muffin-game-js#readme",
+  "dependencies": {
+    "muffin-game": "^0.0.3",
+    "pixi.js": "^6.3.0"
+  },
+  "devDependencies": {
+    "babel-loader": "^8.2.4",
+    "webpack-cli": "^4.9.2"
+  }
+}
