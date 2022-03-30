@@ -1,5 +1,5 @@
 {
-  "name": "your-game-name-here",
+  "name": "pipe-puzzle",
   "version": "0.0.3",
   "description": "A game created using the muffin-game template",
   "main": "src/setup.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tassaron/muffin-game-js.git"
+    "url": "git+https://github.com/tassaron/pipe-puzzle.git"
   },
   "keywords": [
     "videogame"
@@ -19,9 +19,9 @@
   "author": "tassaron",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tassaron/muffin-game-js/issues"
+    "url": "https://github.com/tassaron/pipe-puzzle/issues"
   },
-  "homepage": "https://github.com/tassaron/muffin-game-js#readme",
+  "homepage": "https://github.com/tassaron/pipe-puzzle#readme",
   "dependencies": {
     "muffin-game": "^0.0.3",
     "pixi.js": "^6.3.0"
