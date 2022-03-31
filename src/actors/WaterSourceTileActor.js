@@ -6,14 +6,21 @@ import EllipseActor from "muffin-game/actors/EllipseActor";
 export const randomDirection = () => Math.floor(Math.random() * 4);
 
 
+export const waterDirections = {
+    left: 0,
+    right: 1,
+    down: 2,
+    up: 3,
+    0: "left",
+    1: "right",
+    2: "down",
+    3: "up",
+}
+
+
 export default class WaterSourceTileActor extends RectangleActor {
     flowAnimation = null;
     direction = randomDirection();
-    /* 0 - left
-     * 1 - right
-     * 2 - down
-     * 3 - up
-     */
 
     constructor(game, coords, maxY, maxX) {
         super(game, 73, 73, 0x000000, 0xffffff);
@@ -23,10 +30,10 @@ export default class WaterSourceTileActor extends RectangleActor {
         this.gridx = x;
         logger.debug(`Water source placed at x${x},y${y}. MaxX is ${maxX}, maxY is ${maxY}`);
         while (
-            (x == 0 && this.direction == 0) ||
-            (x == maxX && this.direction == 1) ||
-            (y == maxY && this.direction == 2) ||
-            (y == 0 && this.direction == 3)) {
+            (x == 0 && this.direction == waterDirections.left) ||
+            (x == maxX && this.direction == waterDirections.right) ||
+            (y == maxY && this.direction == waterDirections.down) ||
+            (y == 0 && this.direction == waterDirections.up)) {
                 logger.debug("Oops! Water source tile had to change direction");
                 this.direction = randomDirection();
         }
@@ -73,17 +80,18 @@ export default class WaterSourceTileActor extends RectangleActor {
     stopFlowAnimation() {
         this.flowAnimation = null;
     }
+}
 
-    get directionCoords() {
-        switch (this.direction) {
-            case 0:
-                return [this.gridy, this.gridx - 1];
-            case 1:
-                return [this.gridy, this.gridx + 1];
-            case 2:
-                return [this.gridy + 1, this.gridx];
-            case 3:
-                return [this.gridy - 1, this.gridx];
-        }
+
+export function getDirectionCoords(direction, y, x) {
+    switch (direction) {
+        case 0:
+            return [y, x - 1];
+        case 1:
+            return [y, x + 1];
+        case 2:
+            return [y + 1, x];
+        case 3:
+            return [y - 1, x];
     }
 }
