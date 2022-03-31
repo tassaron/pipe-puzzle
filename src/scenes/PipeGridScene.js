@@ -4,10 +4,7 @@ import WaterSourceTileActor, { getDirectionCoords, waterDirections } from "../ac
 import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import GridScene from "muffin-game/grids/GridScene";
-import { logger } from "muffin-game/core/logger";
-
-
-logger.LOGLEVEL = 1;
+import { logger } from "../logger";
 
 
 export default class PipeGridScene extends GridScene {
@@ -58,7 +55,7 @@ export default class PipeGridScene extends GridScene {
                 const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1)
                 waterSourceUnderlyingTile.addChild(waterSourceTile);
                 waterSourceUnderlyingTile.interactive = false;
-                this._grid[this.waterDestination[1]][this.waterDestination[0]].tint = 0x000000;
+                this.placeDestinationLine([this.waterDestination[1]], [this.waterDestination[0]]);
             }
         );
 
@@ -177,8 +174,12 @@ export default class PipeGridScene extends GridScene {
     
     tick(delta, keyboard) {
         super.tick(delta, keyboard);
-        if (keyboard.number == 7) {
+        if (logger.minimum < logger.level.error && keyboard.number == 7) {
             this.game.reset();
         }
+    }
+
+    placeDestinationLine(y, x) {
+        this._grid[y][x].tint = 0x000000;
     }
 }
