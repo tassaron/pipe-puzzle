@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import WaterSourceTileActor from "../actors/WaterSourceTileActor";
+import WaterSourceTileActor, { getDirectionCoords, waterDirections } from "../actors/WaterSourceTileActor";
 import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import GridScene from "muffin-game/grids/GridScene";
@@ -45,9 +45,10 @@ export default class PipeGridScene extends GridScene {
         // which will make the water source non-clickable when the scene actually starts
         this.beforeMount(
             () => {
-                const waterSourceTile = this.getWaterSourceUnderlyingTile();
-                waterSourceTile.addChild(new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1));
-                waterSourceTile.interactive = false;
+                const waterSourceUnderlyingTile = this.getWaterSourceUnderlyingTile();
+                const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1)
+                waterSourceUnderlyingTile.addChild(waterSourceTile);
+                waterSourceUnderlyingTile.interactive = false;
             }
         );
 
@@ -77,23 +78,76 @@ export default class PipeGridScene extends GridScene {
 
     startWater() {
         logger.info("Water source starting animation! 🌊");
-        this.getWaterSourceTile().startFlowAnimation();
+        const waterSourceTile = this.getWaterSourceTile()
+        waterSourceTile.startFlowAnimation();
+        const waterSourceTileCoords = [waterSourceTile.gridy, waterSourceTile.gridx];
+
+        // Double-check everything is sensible because errors will be harder to debug later
+        if (!waterSourceTileCoords.every((val, index) => val === this.waterSource[index])) {
+            logger.error("The water source tile is in the wrong spot. Everything's gonna break")
+            logger.error(`actor coords: ${waterSourceTileCoords} -- gridscene coords: ${this.waterSource}`)
+        }
+
+        this.waterPipes[this.waterSource[0]][this.waterSource[1]] = true;
+        //console.log(this.waterPipes);
+        //console.log(this._grid);
         this.game.startTimer(() => {
             this.startFlowing();
         }, 254.0);
     }
 
     startFlowing() {
+        if (!this.mounted) return;
         const waterSourceTile = this.getWaterSourceTile();
-        const [y, x] = waterSourceTile.directionCoords;
+        const [y, x] = getDirectionCoords(waterSourceTile.direction, waterSourceTile.gridy, waterSourceTile.gridx);
         logger.info(`WATER TIME! Looking at x${x},y${y} for the first pipe!`);
         waterSourceTile.stopFlowAnimation();
+        this.flow(waterSourceTile.direction, x, y);
+    }
+
+    flow(direction, x, y) {
+        if (!this.mounted) return;
+        // the x and y are backwards >:[ I suck
+        // Coords are the water's current location
         if (
             this._grid[x][y].children.length == 0 ||
-            !this._grid[x][y].children[0].waterCanFlow(waterSourceTile.direction)
+            !this._grid[x][y].children[0].waterCanFlow(direction)
                 ) {
             this.game.gameOver();
+            return;
         }
+        
+        // Get new coords, where water is going next
+        let [newy, newx] = getDirectionCoords(direction, y, x);
+        logger.info(`Looking at x${newx},y${newy} for the next pipe!`);
+        // Draw the water flowing
+        const pipe = this._grid[x][y].children[0];
+        pipe.tint = 0x0000ff;
+
+        // Get next direction (check for the bendy pipes!)
+        switch (pipe.variety) {
+            case 0:
+                // water flows up or right
+                direction = direction == waterDirections.left ? 3 : 1;
+                break;
+            case 1:
+                // water flows up or left
+                direction = direction == waterDirections.right ? 3 : 0;
+                break;
+            case 2:
+                // water flows down or left
+                direction = direction == waterDirections.right ? 2 : 0;
+                break;
+            case 3:
+                // water flows down or right
+                direction = direction == waterDirections.left ? 2 : 1;
+        }
+
+        logger.info(`Next direction for water: ${waterDirections[direction]}`);
+        [newy, newx] = getDirectionCoords(direction, y, x);
+        this.game.startTimer(() => {
+            this.flow(direction, newx, newy);
+        }, 254.0);   
     }
 
     tick(delta, keyboard) {
