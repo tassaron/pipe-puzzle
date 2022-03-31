@@ -1,9 +1,9 @@
 import * as PIXI from "pixi.js";
+import WorldScene from "./WorldScene";
 import WaterSourceTileActor, { getDirectionCoords, waterDirections } from "../actors/WaterSourceTileActor";
 import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import GridScene from "muffin-game/grids/GridScene";
-import { createGrid } from "muffin-game/grids/Grid";
 import { logger } from "muffin-game/core/logger";
 
 
@@ -34,13 +34,22 @@ export default class PipeGridScene extends GridScene {
             return new EmptyPipeTileActor(game, x, y);
         }
         super(game, cols, rows, gridSize, {initial: pipeCellFactory});
-        
-        // Make secondary grid to store waterlogged pipes
-        this.waterPipes = createGrid(this.cols, this.rows);
 
         // Where the water starts
         this.waterSource = [Math.floor(Math.random() * this.cols), Math.floor(Math.random() * this.rows)];
 
+        // Where the water should go
+        const random = (max) => Math.floor(Math.random() * (max + 1));
+        this.waterDestination = [random(1), random(1)];
+        if (this.waterDestination[0] == 1) this.waterDestination[0] = this.cols - 1;
+        if (this.waterDestination[1] == 1) this.waterDestination[1] = this.rows - 1;
+        if (random(1) == 0) {
+            this.waterDestination[0] = random(this.cols - 3) + 1;
+        } else {
+            this.waterDestination[1] = random(this.rows - 3) + 1;
+        }
+        logger.info(`Water destination is ${this.waterDestination}`);
+        
         // Tiles get added by world scene after this constructor, so delay the next function
         // which will make the water source non-clickable when the scene actually starts
         this.beforeMount(
@@ -49,6 +58,7 @@ export default class PipeGridScene extends GridScene {
                 const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1)
                 waterSourceUnderlyingTile.addChild(waterSourceTile);
                 waterSourceUnderlyingTile.interactive = false;
+                this._grid[this.waterDestination[1]][this.waterDestination[0]].tint = 0x000000;
             }
         );
 
@@ -77,6 +87,7 @@ export default class PipeGridScene extends GridScene {
     }
 
     startWater() {
+        if (!this.mounted) return;
         logger.info("Water source starting animation! 🌊");
         const waterSourceTile = this.getWaterSourceTile()
         waterSourceTile.startFlowAnimation();
@@ -88,9 +99,6 @@ export default class PipeGridScene extends GridScene {
             logger.error(`actor coords: ${waterSourceTileCoords} -- gridscene coords: ${this.waterSource}`)
         }
 
-        this.waterPipes[this.waterSource[0]][this.waterSource[1]] = true;
-        //console.log(this.waterPipes);
-        //console.log(this._grid);
         this.game.startTimer(() => {
             this.startFlowing();
         }, 254.0);
@@ -100,7 +108,7 @@ export default class PipeGridScene extends GridScene {
         if (!this.mounted) return;
         const waterSourceTile = this.getWaterSourceTile();
         const [y, x] = getDirectionCoords(waterSourceTile.direction, waterSourceTile.gridy, waterSourceTile.gridx);
-        logger.info(`WATER TIME! Looking at x${x},y${y} for the first pipe!`);
+        logger.info(`WATER TIME! Starting a timer chain of flow() calls`);
         waterSourceTile.stopFlowAnimation();
         this.flow(waterSourceTile.direction, x, y);
     }
@@ -108,7 +116,8 @@ export default class PipeGridScene extends GridScene {
     flow(direction, x, y) {
         if (!this.mounted) return;
         // the x and y are backwards >:[ I suck
-        // Coords are the water's current location
+        // Coords are the water's next location
+        logger.info(`Looking at x${x},y${y} for the next pipe!`);
         if (
             this._grid[x][y].children.length == 0 ||
             !this._grid[x][y].children[0].waterCanFlow(direction)
@@ -116,14 +125,11 @@ export default class PipeGridScene extends GridScene {
             this.game.gameOver();
             return;
         }
-        
-        // Get new coords, where water is going next
-        let [newy, newx] = getDirectionCoords(direction, y, x);
-        logger.info(`Looking at x${newx},y${newy} for the next pipe!`);
+
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
         pipe.tint = 0x0000ff;
-
+        
         // Get next direction (check for the bendy pipes!)
         switch (pipe.variety) {
             case 0:
@@ -144,12 +150,31 @@ export default class PipeGridScene extends GridScene {
         }
 
         logger.info(`Next direction for water: ${waterDirections[direction]}`);
-        [newy, newx] = getDirectionCoords(direction, y, x);
+        const coords = getDirectionCoords(direction, y, x);
+        const [newy, newx] = coords;
+
+        // Check if water is going off-grid in the next step
+        if (newx < 0 || newx == this.rows || newy < 0 || newy == this.cols) {
+            // if we're on the waterDestination, we win!
+            console.log(coords);
+            console.log(this.waterDestination);
+            if (coords.some((val, index) => val === this.waterDestination[index])) {
+                this.game.level++;
+                this.game.changeScene(new WorldScene(this.game));
+            } else {
+                logger.info("Waiting to die (good song by The Grammar Club btw)")
+                this.game.startTimer(() => {
+                    this.mounted && this.game.gameOver();
+                }, 254.0);
+                return;
+            }
+        }
+
         this.game.startTimer(() => {
             this.flow(direction, newx, newy);
-        }, 254.0);   
+        }, 254.0);
     }
-
+    
     tick(delta, keyboard) {
         super.tick(delta, keyboard);
         if (keyboard.number == 7) {
