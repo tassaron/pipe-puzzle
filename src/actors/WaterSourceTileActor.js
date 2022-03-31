@@ -19,6 +19,8 @@ export default class WaterSourceTileActor extends RectangleActor {
         super(game, 73, 73, 0x000000, 0xffffff);
 
         const [y, x] = coords;
+        this.gridy = y;
+        this.gridx = x;
         logger.debug(`Water source placed at x${x},y${y}. MaxX is ${maxX}, maxY is ${maxY}`);
         while (
             (x == 0 && this.direction == 0) ||
@@ -70,5 +72,18 @@ export default class WaterSourceTileActor extends RectangleActor {
 
     stopFlowAnimation() {
         this.flowAnimation = null;
+    }
+
+    get directionCoords() {
+        switch (this.direction) {
+            case 0:
+                return [this.gridy, this.gridx - 1];
+            case 1:
+                return [this.gridy, this.gridx + 1];
+            case 2:
+                return [this.gridy + 1, this.gridx];
+            case 3:
+                return [this.gridy - 1, this.gridx];
+        }
     }
 }

@@ -26,4 +26,52 @@ export default class PipeTileActor extends TileActor {
         }
         this.setFrame[tile[this.variety].y][tile[this.variety].x]();
     }
+
+    waterCanFlow(waterDirection) {
+        /* Return true if the water can flow through this pipe
+         * 0 - left
+         * 1 - right
+         * 2 - down
+         * 3 - up
+         */
+        switch(waterDirection) {
+            case 0:
+                switch(this.variety) {
+                    case 0:
+                    case 3:
+                    case 4:
+                    case 6:
+                        return true;
+                }
+                break;
+            case 1:
+                switch(this.variety) {
+                    case 1:
+                    case 2:
+                    case 4:
+                    case 6:
+                        return true;
+                }
+                break;
+            case 2:
+                switch(this.variety) {
+                    case 0:
+                    case 1:
+                    case 5:
+                    case 6:
+                        return true;
+                }
+                break;
+            case 3:
+                switch(this.variety) {
+                    case 2:
+                    case 3:
+                    case 5:
+                    case 6:
+                        return true;
+                }
+                break;
+        }
+        return false;
+    }
 }

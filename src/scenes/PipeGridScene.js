@@ -45,8 +45,8 @@ export default class PipeGridScene extends GridScene {
         // which will make the water source non-clickable when the scene actually starts
         this.beforeMount(
             () => {
-                const waterSourceTile = this.getWaterSourceTile();
-                waterSourceTile.addChild(new WaterSourceTileActor(game));
+                const waterSourceTile = this.getWaterSourceUnderlyingTile();
+                waterSourceTile.addChild(new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1));
                 waterSourceTile.interactive = false;
             }
         );
@@ -61,17 +61,45 @@ export default class PipeGridScene extends GridScene {
         this.subcontainer.y = 30;
     }
 
-    getWaterSourceTile() {
+    getWaterSourceUnderlyingTile() {
         let waterSourceTile = this[this.waterSource[1]][this.waterSource[0]];
         if (waterSourceTile === undefined) {
-            logger.error(`The water source cell at x${this.waterSource[0]}, y${this.waterSource[1]} is undefined`);
+            
             if (this._grid === undefined) logger.error("in fact, the entire grid is undefined.");
             waterSourceTile = this[0][0];
         }
         return waterSourceTile;
     }
 
+    getWaterSourceTile() {
+        return this.getWaterSourceUnderlyingTile().children[0];
+    }
+
     startWater() {
-        logger.info("Water source starting! 🌊");
+        logger.info("Water source starting animation! 🌊");
+        this.getWaterSourceTile().startFlowAnimation();
+        this.game.startTimer(() => {
+            this.startFlowing();
+        }, 254.0);
+    }
+
+    startFlowing() {
+        const waterSourceTile = this.getWaterSourceTile();
+        const [y, x] = waterSourceTile.directionCoords;
+        logger.info(`WATER TIME! Looking at x${x},y${y} for the first pipe!`);
+        waterSourceTile.stopFlowAnimation();
+        if (
+            this._grid[x][y].children.length == 0 ||
+            !this._grid[x][y].children[0].waterCanFlow(waterSourceTile.direction)
+                ) {
+            this.game.gameOver();
+        }
+    }
+
+    tick(delta, keyboard) {
+        super.tick(delta, keyboard);
+        if (keyboard.number == 7) {
+            this.game.reset();
+        }
     }
 }
