@@ -1,10 +1,14 @@
 import * as PIXI from "pixi.js";
 import WorldScene from "./WorldScene";
 import WaterSourceTileActor, { getDirectionCoords, waterDirections } from "../actors/WaterSourceTileActor";
+import Actor from "muffin-game/actors/Actor";
 import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import GridScene from "muffin-game/grids/GridScene";
 import { logger } from "../logger";
+
+
+const FLOW_DELAY = 254.0;
 
 
 export default class PipeGridScene extends GridScene {
@@ -62,7 +66,7 @@ export default class PipeGridScene extends GridScene {
         // Create background rectangle behind the grid for extra decoration
         // It's only behind the grid because non-grid actors are mounted before the grid's actors
         // This is an implementation detail possible to change in a future version of muffin-game
-        this.actors.background = new RectangleActor(game, (73 * 9) + 4, (73 * 6) + 4, 0xffffff, 0x000000);
+        this.actors.background = new RectangleActor(game, (gridSize * 9) + 4, (gridSize * 6) + 4, 0xffffff, 0x000000);
         this.actors.background.x = 35;
         this.actors.background.y = 28;
         this.subcontainer.x = 37;
@@ -72,8 +76,7 @@ export default class PipeGridScene extends GridScene {
     getWaterSourceUnderlyingTile() {
         let waterSourceTile = this[this.waterSource[1]][this.waterSource[0]];
         if (waterSourceTile === undefined) {
-            
-            if (this._grid === undefined) logger.error("in fact, the entire grid is undefined.");
+            logger.error("the water source tile is undefined.");
             waterSourceTile = this[0][0];
         }
         return waterSourceTile;
@@ -98,7 +101,7 @@ export default class PipeGridScene extends GridScene {
 
         this.game.startTimer(() => {
             this.startFlowing();
-        }, 254.0);
+        }, FLOW_DELAY);
     }
 
     startFlowing() {
@@ -125,7 +128,23 @@ export default class PipeGridScene extends GridScene {
 
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
-        pipe.tint = 0x0000ff;
+        const waterPipe = new Actor(this.game, pipe.texture);
+        const waterHighlightPipe = new Actor(this.game, pipe.texture);
+        waterHighlightPipe.alpha = 0.0;
+        waterHighlightPipe.tint = 0x2377ff;
+        waterHighlightPipe.blendMode = PIXI.BLEND_MODES.ADD;
+        pipe.tint = 0x2377ff;
+        pipe.parent.addChild(waterPipe)
+        pipe.parent.addChild(waterHighlightPipe);
+        const waterAnimate = (delta, keyboard) => {
+            waterPipe.alpha -= delta / FLOW_DELAY;
+            waterHighlightPipe.alpha += delta / FLOW_DELAY;
+        }
+        this.beforeTick(waterAnimate);
+        this.game.startTimer(() => {
+            // #TODO muffin-game needs a way to remove functions :)
+            this._beforeTickFuncs = [];
+        }, FLOW_DELAY);
         
         // Get next direction (check for the bendy pipes!)
         switch (pipe.variety) {
@@ -153,23 +172,24 @@ export default class PipeGridScene extends GridScene {
         // Check if water is going off-grid in the next step
         if (newx < 0 || newx == this.rows || newy < 0 || newy == this.cols) {
             // if we're on the waterDestination, we win!
-            console.log(coords);
-            console.log(this.waterDestination);
             if (coords.some((val, index) => val === this.waterDestination[index])) {
-                this.game.level++;
-                this.game.changeScene(new WorldScene(this.game));
+                this.game.startTimer(() => {
+                    this.game.level++;
+                    this.game.changeScene(new WorldScene(this.game));
+                }, FLOW_DELAY);
+                return;
             } else {
                 logger.info("Waiting to die (good song by The Grammar Club btw)")
                 this.game.startTimer(() => {
                     this.mounted && this.game.gameOver();
-                }, 254.0);
+                }, FLOW_DELAY);
                 return;
             }
         }
 
         this.game.startTimer(() => {
             this.flow(direction, newx, newy);
-        }, 254.0);
+        }, FLOW_DELAY);
     }
     
     tick(delta, keyboard) {
