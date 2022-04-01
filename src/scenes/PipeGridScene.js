@@ -109,7 +109,7 @@ export default class PipeGridScene extends GridScene {
 
         this.game.startTimer(() => {
             this.startFlowing();
-        }, FLOW_DELAY);
+        }, FLOW_DELAY, "starting first flow");
     }
 
     startFlowing() {
@@ -153,7 +153,7 @@ export default class PipeGridScene extends GridScene {
         this.game.startTimer(() => {
             // #TODO muffin-game needs a way to remove functions :)
             this._beforeTickFuncs = [];
-        }, FLOW_DELAY);
+        }, FLOW_DELAY, "remove beforeTickFuncs");
         
         // Get next direction (check for the bendy pipes!)
         switch (pipe.variety) {
@@ -185,20 +185,20 @@ export default class PipeGridScene extends GridScene {
                 this.game.startTimer(() => {
                     this.game.scene.level++;
                     this.game.changeScene(new WorldScene(this.game, this.game.scene.score, this.game.scene.level));
-                }, FLOW_DELAY);
+                }, FLOW_DELAY, "gonna win");
                 return;
             } else {
                 logger.info("Waiting to die (good song by The Grammar Club btw)")
                 this.game.startTimer(() => {
                     this.mounted && this.game.gameOver();
-                }, FLOW_DELAY);
+                }, FLOW_DELAY, "gonna die");
                 return;
             }
         }
 
         this.game.startTimer(() => {
             this.flow(direction, newx, newy);
-        }, FLOW_DELAY);
+        }, FLOW_DELAY, "flow");
     }
     
     tick(delta, keyboard) {

@@ -1,5 +1,3 @@
-import * as PIXI from "pixi.js";
-import { logger } from "muffin-game/core/logger";
 import { newBackButton } from "muffin-game/scenes/MenuScene";
 import Scene from "muffin-game/scenes/Scene";
 import PipeGridScene from "./PipeGridScene";
@@ -58,7 +56,8 @@ export default class WorldScene extends Scene {
                 this.grid.startWater();
                 this.timer = -1;
             },
-            this.levelTimers[this.level]
+            this.levelTimers[this.level],
+            "initial flow grow"
         );
         this.beforeUnmount(() => {
             if (this.timer > -1) this.game.stopTimer(this.timer)
