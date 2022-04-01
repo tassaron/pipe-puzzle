@@ -9,6 +9,7 @@ export default class PipeTroughScene extends Scene {
     constructor(game) {
         super(game);
         this.subcontainer.y = game.height - 73;
+        this.subcontainer.x = 219;
         this.upcomingPipes = [];
         for (let i = 0; i < 5; i++) {
             this.addPipeToTrough();
