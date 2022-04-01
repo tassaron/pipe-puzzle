@@ -31,7 +31,14 @@ export default class WorldScene extends Scene {
                 this.grid._grid[y][x].pointertap = (e) => {
                     if (!this.grid.mounted) return;
                     const pipe = this.trough.getNextPipe();
-                    this.grid._grid[y][x].addChild(pipe);
+                    if (this.grid._grid[y][x].children.length > 0) {
+                        const oldChild = this.grid._grid[y][x].children[0];
+                        this.grid._grid[y][x].removeChild(oldChild);
+                        this.grid._grid[y][x].addChild(pipe);
+                        this.grid._grid[y][x].addChild(oldChild);
+                    } else {
+                        this.grid._grid[y][x].addChild(pipe);
+                    }
                     this.grid._grid[y][x].interactive = false;
                     pipe.y = 0;
                     pipe.x = 0;
