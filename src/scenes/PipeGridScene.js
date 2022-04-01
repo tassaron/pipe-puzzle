@@ -201,6 +201,24 @@ export default class PipeGridScene extends GridScene {
     }
 
     placeDestinationLine(y, x) {
-        this._grid[y][x].tint = 0x000000;
+        console.log(`x${y}, y${x}`);
+        let flowIndicator;
+        if (y == 0 || y == this.rows - 1) {
+            // vertical
+            flowIndicator = new RectangleActor(this.game, 8, 65, 0xffffff, null);
+            flowIndicator.x = -4;
+            flowIndicator.y = 4;
+        } else {
+            // horizontal
+            flowIndicator = new RectangleActor(this.game, 65, 8, 0xffffff, null);
+            flowIndicator.x = 4;
+            flowIndicator.y = -4;
+        }
+        this._grid[y][x].addChild(flowIndicator);
+        if (y == this.rows - 1) {
+            flowIndicator.x = 73 - 4;
+        } else if (x == this.cols - 1) {
+            flowIndicator.y = 73 - 4;
+        }
     }
 }
