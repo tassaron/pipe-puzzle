@@ -17,30 +17,42 @@ export default class WorldScene extends Scene {
     timer = -1;
     oldScore = 0;
     oldLevel = 0;
-
+    
     constructor(game, score = 0, level = 0) {
         super(game);
         this.score = score;
         this.level = level;
         this.actors.backButton = newBackButton(game, MenuScene);
+        
+        // Create subscenes
         this.grid = new PipeGridScene(game);
-
         this.trough = new PipeTroughScene(game);
+        this.subscenes = [this.grid, this.trough];
+
+        // Add click/tap events to all grid tiles (the `EmptyPipeTileActor`s)
         for (let x = 0; x < this.grid.cols; x++) {
             for (let y = 0; y < this.grid.rows; y++) {
-                this.grid._grid[y][x].interactive = true;
-                this.grid._grid[y][x].pointertap = (e) => {
+                this.grid[y][x].interactive = true;
+                this.grid[y][x].pointertap = (e) => {
                     if (!this.grid.mounted) return;
+                    // Get pipe actor from PipeTroughScene
                     const pipe = this.trough.getNextPipe();
-                    if (this.grid._grid[y][x].children.length > 0) {
-                        const oldChild = this.grid._grid[y][x].children[0];
-                        this.grid._grid[y][x].removeChild(oldChild);
-                        this.grid._grid[y][x].addChild(pipe);
-                        this.grid._grid[y][x].addChild(oldChild);
+
+                    // Add pipe actor as child of the EmptyPipeTileActor
+                    if (this.grid[y][x].children.length > 0) {
+                        // The destination tile already has a child
+                        // so if player clicks this tile, remove that child first
+                        // this way the pipe is always at index 0, keeping it simple!
+                        const oldChild = this.grid[y][x].children[0];
+                        this.grid[y][x].removeChild(oldChild);
+                        this.grid[y][x].addChild(pipe);
+                        this.grid[y][x].addChild(oldChild);
                     } else {
-                        this.grid._grid[y][x].addChild(pipe);
+                        this.grid[y][x].addChild(pipe);
                     }
-                    this.grid._grid[y][x].interactive = false;
+                    // The EmptyPipeTileActor is no longer clickable
+                    this.grid[y][x].interactive = false;
+                    // The pipe actor's x and y is relative to the parent
                     pipe.y = 0;
                     pipe.x = 0;
                 };
@@ -50,7 +62,6 @@ export default class WorldScene extends Scene {
         this.beforeMount(() => {
             this.startWaterTimer();
         });
-        this.subscenes = [this.grid, this.trough];
     }
 
     startWaterTimer() {
