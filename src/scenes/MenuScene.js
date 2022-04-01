@@ -17,7 +17,7 @@ export default class MenuScene extends Scene {
         game.gameOverScene = GameOverScene;
         super(game, options);
         addNewMenuButtonsToScene(this);
-        this.buttons[0].y -= 50;
+        this.buttons[0].y -= 25;
         this.actors.fuel = game.sprites.fuel();
         this.actors.fuel.x = game.width / 2;
         this.actors.fuel.y = (game.height - this.actors.fuel.height) - 50;
