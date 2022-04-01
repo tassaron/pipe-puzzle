@@ -11,7 +11,7 @@ export default class GameOverScene extends Scene {
         super(game, {});
         // The empty object tells muffin-game not to apply default options
         // which causes this scene not to unmount the previous scene when mounted
-        this.actors.text = new ButtonActor(game, RectangleActor, 266, 133, "Game Over", null, 0x933ed3, 0x000000);
+        this.actors.text = new ButtonActor(game, RectangleActor, 266, 133, "Game Over", {color: "#ffffff"}, 0x6d4a82, 0x4e315e);
         this.actors.text.anchor.x = 0.5;
         this.actors.text.anchor.y = 0.5;
         this.actors.text.x = game.width / 2;
