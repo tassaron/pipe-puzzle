@@ -3,7 +3,6 @@ import { addNewMenuButtonsToScene } from "muffin-game/scenes/MenuScene"
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import ButtonActor from "muffin-game/actors/ButtonActor";
 import WorldScene from "./WorldScene";
-import GameOverScene from "./GameOverScene";
 import HelpScene from "./HelpScene";
 
 
@@ -14,7 +13,6 @@ export default class MenuScene extends Scene {
     ];
 
     constructor(game, options) {
-        game.gameOverScene = GameOverScene;
         super(game, options);
         addNewMenuButtonsToScene(this);
         this.buttons[0].y -= 25;
