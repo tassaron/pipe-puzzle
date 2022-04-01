@@ -7,8 +7,11 @@ import ButtonActor from "muffin-game/actors/ButtonActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 
 
+const LEVEL_DELAY_TIME = 60.0;
+const LEVEL_DELAY_MAX = LEVEL_DELAY_TIME * 10;
+
+
 export default class WorldScene extends Scene {
-    levelTimers = [480.0, 240.0, 120.0];
     score = 0;
     level = 0;
     timer = -1;
@@ -51,12 +54,13 @@ export default class WorldScene extends Scene {
     }
 
     startWaterTimer() {
+        const flowDelay = Math.max(LEVEL_DELAY_MAX - (this.level * LEVEL_DELAY_TIME), 0.0);
         this.timer = this.game.startTimer(
             () => {
                 this.grid.startWater();
                 this.timer = -1;
             },
-            this.levelTimers[this.level],
+            flowDelay,
             "initial flow grow"
         );
         this.beforeUnmount(() => {
