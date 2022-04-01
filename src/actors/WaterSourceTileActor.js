@@ -64,7 +64,7 @@ export default class WaterSourceTileActor extends RectangleActor {
     }
 
     startFlowAnimation() {
-        this.flowAnimation = new EllipseActor(this.game, 1, 1, 0x0000ff, null);
+        this.flowAnimation = new EllipseActor(this.game, 1, 1, 0x2187d9, null);
         this.addChild(this.flowAnimation);
         this.flowAnimation.x = 73 / 2;
         this.flowAnimation.y = 73 / 2;
