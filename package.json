@@ -1,6 +1,6 @@
 {
   "name": "pipe-puzzle",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "A game created using the muffin-game template",
   "main": "src/setup.js",
   "root": "src",
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/tassaron/pipe-puzzle#readme",
   "dependencies": {
-    "muffin-game": "^0.0.3",
+    "muffin-game": "^0.0.5",
     "pixi.js": "^6.3.0"
   },
   "devDependencies": {
