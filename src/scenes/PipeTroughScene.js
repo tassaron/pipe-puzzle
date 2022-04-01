@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import Scene from "muffin-game/scenes/Scene";
-import { logger } from "muffin-game/core/logger";
+import { logger } from "../logger";
 
 
 export default class PipeTroughScene extends Scene {

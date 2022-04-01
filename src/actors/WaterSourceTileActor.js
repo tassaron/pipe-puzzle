@@ -1,4 +1,4 @@
-import { logger } from "muffin-game/core/logger";
+import { logger } from "../logger";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import EllipseActor from "muffin-game/actors/EllipseActor";
 
