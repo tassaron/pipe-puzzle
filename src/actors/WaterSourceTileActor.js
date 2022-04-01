@@ -80,6 +80,10 @@ export default class WaterSourceTileActor extends RectangleActor {
     stopFlowAnimation() {
         this.flowAnimation = null;
     }
+
+    waterCanFlow() {
+        return false;
+    }
 }
 
 
