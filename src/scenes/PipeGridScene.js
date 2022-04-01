@@ -12,43 +12,43 @@ const FLOW_DELAY = 254.0;
 
 
 export default class PipeGridScene extends GridScene {
+    static cols = 6;
+    static rows = 9;
+    static gridSize = 73;
     subcontainer = new PIXI.Container();
 
     constructor(game) {
-        const cols = 6;
-        const rows = 9;
-        const gridSize = 73;
         let x = -1;
         let y = 0;
 
         // A closure capturing x, y to fill the grid with clickable tiles
         const pipeCellFactory = () => {
             x++;
-            if (x > cols - 1) {
+            if (x > PipeGridScene.cols - 1) {
                 x = 0
                 y++;
             }
-            if (y > rows - 1) {
+            if (y > PipeGridScene.rows - 1) {
                 logger.error("IndexError while creating PipeGridScene (the closure broke)");
                 y = 0;
             }
             return new EmptyPipeTileActor(game, x, y);
         }
-        super(game, cols, rows, gridSize, {initial: pipeCellFactory});
+        super(game, PipeGridScene.cols, PipeGridScene.rows, PipeGridScene.gridSize, {initial: pipeCellFactory});
 
         // Where the water starts
-        this.waterSource = [Math.floor(Math.random() * this.cols), Math.floor(Math.random() * this.rows)];
+        this.waterSource = [Math.floor(Math.random() * PipeGridScene.cols), Math.floor(Math.random() * PipeGridScene.rows)];
 
         const random = (max) => Math.floor(Math.random() * (max + 1));
         this.waterDestination = [random(1), random(1)];
         // Where the water should go
         const getWaterDestination = () => {
-            if (this.waterDestination[0] == 1) this.waterDestination[0] = this.cols - 1;
-            if (this.waterDestination[1] == 1) this.waterDestination[1] = this.rows - 1;
+            if (this.waterDestination[0] == 1) this.waterDestination[0] = PipeGridScene.cols - 1;
+            if (this.waterDestination[1] == 1) this.waterDestination[1] = PipeGridScene.rows - 1;
             if (random(1) == 0) {
-                this.waterDestination[0] = random(this.cols - 3) + 1;
+                this.waterDestination[0] = random(PipeGridScene.cols - 3) + 1;
             } else {
-                this.waterDestination[1] = random(this.rows - 3) + 1;
+                this.waterDestination[1] = random(PipeGridScene.rows - 3) + 1;
             }
         }
         getWaterDestination();
@@ -64,7 +64,7 @@ export default class PipeGridScene extends GridScene {
         this.beforeMount(
             () => {
                 const waterSourceUnderlyingTile = this.getWaterSourceUnderlyingTile();
-                const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, this.cols - 1, this.rows - 1)
+                const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, PipeGridScene.cols - 1, PipeGridScene.rows - 1)
                 waterSourceUnderlyingTile.addChild(waterSourceTile);
                 waterSourceUnderlyingTile.interactive = false;
                 this.placeDestinationLine([this.waterDestination[1]], [this.waterDestination[0]]);
@@ -74,7 +74,7 @@ export default class PipeGridScene extends GridScene {
         // Create background rectangle behind the grid for extra decoration
         // It's only behind the grid because non-grid actors are mounted before the grid's actors
         // This is an implementation detail possible to change in a future version of muffin-game
-        this.actors.background = new RectangleActor(game, (gridSize * 9) + 4, (gridSize * 6) + 4, 0xffffff, 0x000000);
+        this.actors.background = new RectangleActor(game, (PipeGridScene.gridSize * 9) + 4, (PipeGridScene.gridSize * 6) + 4, 0xffffff, 0x000000);
         this.actors.background.x = 35;
         this.actors.background.y = 28;
         this.subcontainer.x = 37;
@@ -137,6 +137,7 @@ export default class PipeGridScene extends GridScene {
 
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
+        pipe.interactive = false;
         const waterPipe = new Actor(this.game, pipe.texture);
         const waterHighlightPipe = new Actor(this.game, pipe.texture);
         waterHighlightPipe.alpha = 0.0;
@@ -179,7 +180,7 @@ export default class PipeGridScene extends GridScene {
         const [newy, newx] = coords;
 
         // Check if water is going off-grid in the next step
-        if (newx < 0 || newx == this.rows || newy < 0 || newy == this.cols) {
+        if (newx < 0 || newx == PipeGridScene.rows || newy < 0 || newy == PipeGridScene.cols) {
             // if we're on the waterDestination, we win!
             if (coords.some((val, index) => val === this.waterDestination[index])) {
                 this.game.startTimer(() => {
@@ -210,7 +211,7 @@ export default class PipeGridScene extends GridScene {
 
     placeDestinationLine(y, x) {
         let flowIndicator;
-        if (y == 0 || y == this.rows - 1) {
+        if (y == 0 || y == PipeGridScene.rows - 1) {
             // vertical
             flowIndicator = new RectangleActor(this.game, 8, 65, 0xffffff, null);
             flowIndicator.x = -4;
@@ -222,9 +223,9 @@ export default class PipeGridScene extends GridScene {
             flowIndicator.y = -4;
         }
         this._grid[y][x].addChild(flowIndicator);
-        if (y == this.rows - 1) {
+        if (y == PipeGridScene.rows - 1) {
             flowIndicator.x = 73 - 4;
-        } else if (x == this.cols - 1) {
+        } else if (x == PipeGridScene.cols - 1) {
             flowIndicator.y = 73 - 4;
         }
     }
