@@ -4,17 +4,24 @@ import { newBackButton } from "muffin-game/scenes/MenuScene";
 import Scene from "muffin-game/scenes/Scene";
 import PipeGridScene from "./PipeGridScene";
 import PipeTroughScene from "./PipeTroughScene";
-import MyMenuScene from "./MenuScene";
+import MenuScene from "./MenuScene";
+import ButtonActor from "muffin-game/actors/ButtonActor";
+import RectangleActor from "muffin-game/actors/RectangleActor";
 
 
 export default class WorldScene extends Scene {
     levelTimers = [480.0, 240.0, 120.0];
+    score = 0;
     level = 0;
     timer = -1;
+    oldScore = 0;
+    oldLevel = 0;
 
-    constructor(game) {
+    constructor(game, score = 0, level = 0) {
         super(game);
-        this.actors.backButton = newBackButton(game, MyMenuScene);
+        this.score = score;
+        this.level = level;
+        this.actors.backButton = newBackButton(game, MenuScene);
         this.grid = new PipeGridScene(game);
 
         this.trough = new PipeTroughScene(game);
@@ -31,7 +38,10 @@ export default class WorldScene extends Scene {
                 };
             }
         }
-        this.beforeMount(() => this.startWaterTimer());
+        this.createTextActors();
+        this.beforeMount(() => {
+            this.startWaterTimer();
+        });
         this.subscenes = [this.grid, this.trough];
     }
 
@@ -46,5 +56,32 @@ export default class WorldScene extends Scene {
         this.beforeUnmount(() => {
             if (this.timer > -1) this.game.stopTimer(this.timer)
         });
+    }
+
+    createTextActors() {
+        this.actors.scoreText = new ButtonActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {}, 0x6d4a82, 0x4e315e);
+        this.actors.scoreText.x = 125;
+        this.actors.scoreText.y = this.game.height - 50;
+        this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {}, 0x6d4a82, 0x4e315e);
+        this.actors.levelText.x = this.game.width - 125;
+        this.actors.levelText.y = this.game.height - 50;
+    }
+
+    tick(delta, keyboard) {
+        super.tick(delta, keyboard);
+        if (this.score != this.oldScore || this.level != this.oldLevel) {
+            if (!this.mounted) return;
+            this.mounted.removeChild(this.actors.scoreText);
+            this.mounted.removeChild(this.actors.levelText);
+            this.createTextActors();
+            this.mounted.addChild(this.actors.scoreText);
+            this.mounted.addChild(this.actors.levelText);
+        }
+        if (this.score != this.oldScore) {
+            this.oldScore = Number(this.score);
+        }
+        if (this.level != this.oldLevel) {
+            this.oldLevel = Number(this.level);
+        }
     }
 }
