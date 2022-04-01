@@ -209,7 +209,6 @@ export default class PipeGridScene extends GridScene {
     }
 
     placeDestinationLine(y, x) {
-        console.log(`x${y}, y${x}`);
         let flowIndicator;
         if (y == 0 || y == this.rows - 1) {
             // vertical
