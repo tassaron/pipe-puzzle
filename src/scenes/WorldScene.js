@@ -27,38 +27,54 @@ export default class WorldScene extends Scene {
         // Create subscenes
         this.grid = new PipeGridScene(game);
         this.trough = new PipeTroughScene(game);
-        this.subscenes = [this.grid, this.trough];
-
+        
+        // A function that places `PipeTileActor`s on top of `EmptyPipeTileActor`s
+        const placePipe = (x, y) => {
+            if (!this.grid.mounted) return;
+            // Get PipeTileActor from PipeTroughScene
+            const pipeId = this.trough.getNextPipe();
+            const pipe = this.trough.actors[pipeId];
+            
+            // Add PipeTileActor as child of the EmptyPipeTileActor
+            if (this.grid[y][x].children.length > 0) {
+                // The waterDestination tile already has a child
+                // so if player clicks this tile, remove that child first
+                // this way the PipeTileActor is always at index 0, keeping it simple!
+                const oldChild = this.grid[y][x].children[0];
+                this.grid[y][x].removeChild(oldChild);
+                this.grid[y][x].addChild(pipe);
+                this.grid[y][x].addChild(oldChild);
+            } else {
+                this.grid[y][x].addChild(pipe);
+            }
+            // The EmptyPipeTileActor is no longer clickable
+            this.grid[y][x].interactive = false;
+            // The PipeTileActor's x and y is relative to the parent
+            pipe.y = 0;
+            pipe.x = 0;
+            pipe.gridx = x;
+            pipe.gridy = y;
+            // Now the player can click the PipeTileActor to destroy it
+            pipe.interactive = true;
+            pipe.pointertap = (e) => {
+                pipe.explode(pipeId, this.trough);
+                placePipe(x, y);
+            };
+        };
+        
         // Add click/tap events to all grid tiles (the `EmptyPipeTileActor`s)
         for (let x = 0; x < this.grid.cols; x++) {
             for (let y = 0; y < this.grid.rows; y++) {
                 this.grid[y][x].interactive = true;
-                this.grid[y][x].pointertap = (e) => {
-                    if (!this.grid.mounted) return;
-                    // Get pipe actor from PipeTroughScene
-                    const pipe = this.trough.getNextPipe();
-
-                    // Add pipe actor as child of the EmptyPipeTileActor
-                    if (this.grid[y][x].children.length > 0) {
-                        // The destination tile already has a child
-                        // so if player clicks this tile, remove that child first
-                        // this way the pipe is always at index 0, keeping it simple!
-                        const oldChild = this.grid[y][x].children[0];
-                        this.grid[y][x].removeChild(oldChild);
-                        this.grid[y][x].addChild(pipe);
-                        this.grid[y][x].addChild(oldChild);
-                    } else {
-                        this.grid[y][x].addChild(pipe);
-                    }
-                    // The EmptyPipeTileActor is no longer clickable
-                    this.grid[y][x].interactive = false;
-                    // The pipe actor's x and y is relative to the parent
-                    pipe.y = 0;
-                    pipe.x = 0;
-                };
+                this.grid[y][x].pointertap = (e) => placePipe(x, y);
             }
         }
+        this.subscenes = [this.grid, this.trough];
+        
+        // Create score/level text
         this.createTextActors();
+
+        // Start the water timer later, before the scene is mounted
         this.beforeMount(() => {
             this.startWaterTimer();
         });

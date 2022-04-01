@@ -23,7 +23,7 @@ export default class PipeTroughScene extends Scene {
             this.mounted.removeChild(this.actors[nextPipe]);
         }
         this.addPipeToTrough();
-        return this.actors[nextPipe];
+        return nextPipe;
     }
 
     addPipeToTrough() {

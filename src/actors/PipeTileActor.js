@@ -1,8 +1,14 @@
 import TileActor from "muffin-game/actors/TileActor";
+import PipeGridScene from "../scenes/PipeGridScene";
 
 
 export default class PipeTileActor extends TileActor {
+    gridx = -1;
+    gridy = -1;
+    explosion = null;
     variety = Math.floor(Math.random() * 7);
+    id = "";
+    trough = null;
     /*
     * 0 = elbow bend up/right
     * 1 = elbow bend up/left
@@ -73,5 +79,34 @@ export default class PipeTileActor extends TileActor {
                 break;
         }
         return false;
+    }
+
+    explode(id, trough) {
+        this.id = id;
+        this.trough = trough;
+        this.container = trough.mounted;
+        if (!this.id) {
+            logger.error("PipeTileActor doesn't have an actor id")
+        }
+        if (!this.container) {
+            logger.error("PipeTileActor isn't on a mounted container")
+        }
+        this.parent.removeChild(this);
+        this.explosion = this.game.sprites.explosion();
+        this.container.addChild(this.explosion);
+        this.explosion.x = (this.gridy + 1) * PipeGridScene.gridSize + (PipeGridScene.gridSize / 2) - 32;
+        this.explosion.y = (this.gridx + 1) * PipeGridScene.gridSize;// + (PipeGridScene.gridSize / 2);
+        this.explosion.scale.x = 2.0;
+        this.explosion.scale.y = 2.0;
+    }
+
+    tick(delta, keyboard) {
+        super.tick(delta, keyboard);
+        this.explosion?.tick(delta, keyboard);
+        if (this.explosion?.loops > 0) {
+            this.container.removeChild(this.explosion);
+            delete this.trough.actors[this.id];
+        }
+
     }
 }
