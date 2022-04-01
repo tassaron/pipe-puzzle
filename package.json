@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/tassaron/pipe-puzzle#readme",
   "dependencies": {
-    "muffin-game": "^0.0.5",
+    "muffin-game": "^0.0.6",
     "pixi.js": "^6.3.0"
   },
   "devDependencies": {
