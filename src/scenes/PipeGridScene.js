@@ -39,15 +39,23 @@ export default class PipeGridScene extends GridScene {
         // Where the water starts
         this.waterSource = [Math.floor(Math.random() * this.cols), Math.floor(Math.random() * this.rows)];
 
-        // Where the water should go
         const random = (max) => Math.floor(Math.random() * (max + 1));
         this.waterDestination = [random(1), random(1)];
-        if (this.waterDestination[0] == 1) this.waterDestination[0] = this.cols - 1;
-        if (this.waterDestination[1] == 1) this.waterDestination[1] = this.rows - 1;
-        if (random(1) == 0) {
-            this.waterDestination[0] = random(this.cols - 3) + 1;
-        } else {
-            this.waterDestination[1] = random(this.rows - 3) + 1;
+        // Where the water should go
+        const getWaterDestination = () => {
+            if (this.waterDestination[0] == 1) this.waterDestination[0] = this.cols - 1;
+            if (this.waterDestination[1] == 1) this.waterDestination[1] = this.rows - 1;
+            if (random(1) == 0) {
+                this.waterDestination[0] = random(this.cols - 3) + 1;
+            } else {
+                this.waterDestination[1] = random(this.rows - 3) + 1;
+            }
+        }
+        getWaterDestination();
+        while (this.waterDestination.every((val, index) => val === this.waterSource[index])) {
+            // keep generating waterdestinations until they don't intersect the watersource
+            logger.debug(`Oops! Water destination had to change coords -- was ${this.waterDestination}`);
+            getWaterDestination();
         }
         logger.info(`Water destination is ${this.waterDestination}`);
         
