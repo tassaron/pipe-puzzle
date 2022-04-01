@@ -1,6 +1,7 @@
 import Scene from "muffin-game/scenes/Scene";
 import { addNewMenuButtonsToScene } from "muffin-game/scenes/MenuScene"
 import RectangleActor from "muffin-game/actors/RectangleActor";
+import ButtonActor from "muffin-game/actors/ButtonActor";
 import WorldScene from "./WorldScene";
 import GameOverScene from "./GameOverScene";
 import HelpScene from "./HelpScene";
@@ -20,9 +21,13 @@ export default class MenuScene extends Scene {
         this.actors.fuel = game.sprites.fuel();
         this.actors.fuel.x = game.width / 2;
         this.actors.fuel.y = (game.height - this.actors.fuel.height) - 50;
-        this.actors.square = new RectangleActor(game, 50, 50);
-        this.actors.square.x = 100;
-        this.actors.square.y = 100;
+        this.actors.fuel.anchor.x = 0.5;
+        this.actors.fuel.anchor.y = 0.5;
+
+        this.actors.titleText = new ButtonActor(game, RectangleActor, 550, 125, "Pipe Puzzle", {color: 0xffffff, fontSize: "96px"}, 0x6d4a82, 0x4e315e);
+        this.actors.titleText.y = 100;
+        this.actors.titleText.x = game.width / 2;
+        this.actors.titleText.anchor.x = 0.5;
     }
     
     tick(delta, keyboard) {
