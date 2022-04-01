@@ -1,7 +1,8 @@
 # Pipe Puzzle
 A web-playable video game using [Muffin Game Engine](https://github.com/tassaron/muffin-game) and [PixiJS](https://pixijs.io).
 
-## [Play the Game](https://rainey.tech/games/pipe-puzzle)
+## [Play a Beta Version](https://rainey.tech/static/pipe-puzzle-1/)
+<!-- ## [Play the Game](https://rainey.tech/games/pipe-puzzle) -->
 
 - Created using [my one-click template](https://github.com/tassaron/muffin-game-js). Try it yourself!
 
