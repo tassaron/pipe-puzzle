@@ -2,7 +2,7 @@ import { createGame, getTexture } from "muffin-game/core/setuptools";
 import Actor from "muffin-game/actors/Actor";
 import AnimatedActor from 'muffin-game/actors/AnimatedActor';
 import PipeTileActor from "./actors/PipeTileActor";
-import MyMenuScene from "./scenes/MenuScene";
+import MenuScene from "./scenes/MenuScene";
 
 
 const textures = [
@@ -24,4 +24,4 @@ function afterPreload(loader, resources, sprites) {
 };
 
 
-createGame(textures, afterPreload, MyMenuScene);
+createGame(textures, afterPreload, MenuScene);
