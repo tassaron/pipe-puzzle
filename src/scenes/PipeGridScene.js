@@ -125,6 +125,7 @@ export default class PipeGridScene extends GridScene {
             this.game.gameOver();
             return;
         }
+        this.game.scene.score += 100;
 
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
@@ -174,8 +175,8 @@ export default class PipeGridScene extends GridScene {
             // if we're on the waterDestination, we win!
             if (coords.some((val, index) => val === this.waterDestination[index])) {
                 this.game.startTimer(() => {
-                    this.game.level++;
-                    this.game.changeScene(new WorldScene(this.game));
+                    this.game.scene.level++;
+                    this.game.changeScene(new WorldScene(this.game, this.game.scene.score, this.game.scene.level));
                 }, FLOW_DELAY);
                 return;
             } else {
