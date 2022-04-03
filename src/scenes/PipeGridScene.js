@@ -61,7 +61,7 @@ export default class PipeGridScene extends GridScene {
         
         // Tiles get added by world scene after this constructor, so delay the next function
         // which will make the water source non-clickable when the scene actually starts
-        this.beforeMount(
+        this.beforeMount.add(
             () => {
                 const waterSourceUnderlyingTile = this.getWaterSourceUnderlyingTile();
                 const waterSourceTile = new WaterSourceTileActor(game, this.waterSource, PipeGridScene.cols - 1, PipeGridScene.rows - 1)
@@ -150,10 +150,9 @@ export default class PipeGridScene extends GridScene {
             waterPipe.alpha -= delta / FLOW_DELAY;
             waterHighlightPipe.alpha += delta / FLOW_DELAY;
         }
-        this.beforeTick(waterAnimate);
+        this.beforeTick.add(waterAnimate);
         this.game.startTimer(() => {
-            // #TODO muffin-game needs a way to remove functions :)
-            this._beforeTickFuncs = [];
+            this.beforeTick.remove(waterAnimate);
         }, FLOW_DELAY, "remove beforeTickFuncs");
         
         // Get next direction (check for the bendy pipes!)

@@ -68,7 +68,7 @@ export default class WaterSourceTileActor extends RectangleActor {
         this.addChild(this.flowAnimation);
         this.flowAnimation.x = 73 / 2;
         this.flowAnimation.y = 73 / 2;
-        this.game.scene.beforeTick((delta, keyboard) => {
+        this.game.scene.beforeTick.add((delta, keyboard) => {
             if (!this.flowAnimation) return;
             this.flowAnimation.x -= delta / 8;
             this.flowAnimation.y -= delta / 8;

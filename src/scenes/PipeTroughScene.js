@@ -47,17 +47,16 @@ export default class PipeTroughScene extends Scene {
         this.game.startTimer(newPipeActor, PIPE_SLIDE_DELAY, "next pipe appearance");
         
         const slideOldPipesTick = (delta, keyboard) => {
-            if (this.actors[this.upcomingPipes[0]].x == 0) {
-                // finished sliding
-                this._beforeTickFuncs = [];
-            }
             for (let j = 0; j < this.upcomingPipes.length; j++) {
                 this.actors[this.upcomingPipes[j]].x = Math.max(
                     73 * j,
                     this.actors[this.upcomingPipes[j]].x - (73 / PIPE_SLIDE_DELAY) * delta
                 );
+                if (j - 1 == this.upcomingPipes.length && this.actors[this.upcomingPipes[j]].x == j * 73) {
+                    this.beforeTick.remove(slideOldPipesTick);
+                }
             }
         }
-        this.beforeTick(slideOldPipesTick);
+        this.beforeTick.add(slideOldPipesTick);
     }
 }

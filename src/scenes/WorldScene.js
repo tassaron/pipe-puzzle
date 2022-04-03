@@ -75,7 +75,7 @@ export default class WorldScene extends Scene {
         this.createTextActors();
 
         // Start the water timer later, before the scene is mounted
-        this.beforeMount(() => {
+        this.beforeMount.add(() => {
             this.startWaterTimer();
         });
     }
@@ -90,7 +90,7 @@ export default class WorldScene extends Scene {
             flowDelay,
             "initial flow grow"
         );
-        this.beforeUnmount(() => {
+        this.beforeUnmount.add(() => {
             if (this.timer > -1) this.game.stopTimer(this.timer)
         });
     }
