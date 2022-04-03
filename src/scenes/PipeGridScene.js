@@ -150,10 +150,10 @@ export default class PipeGridScene extends GridScene {
             waterPipe.alpha -= delta / FLOW_DELAY;
             waterHighlightPipe.alpha += delta / FLOW_DELAY;
         }
-        this.beforeTick.add(waterAnimate);
+        const result = this.beforeTick.add(waterAnimate);
         this.game.startTimer(() => {
-            this.beforeTick.remove(waterAnimate);
-        }, FLOW_DELAY, "remove beforeTickFuncs");
+            this.beforeTick.remove(result);
+        }, FLOW_DELAY, "remove waterAnimate from tick");
         
         // Get next direction (check for the bendy pipes!)
         switch (pipe.variety) {
