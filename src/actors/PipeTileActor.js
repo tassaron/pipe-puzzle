@@ -21,6 +21,7 @@ export default class PipeTileActor extends TileActor {
 
     constructor(game, texture) {
         super(game, texture, 4, 2, 73);
+        // Grid coords of texture on the spritesheet
         const tile = {
             0: {y: 0, x: 0},
             1: {y: 0, x: 1},
@@ -104,7 +105,7 @@ export default class PipeTileActor extends TileActor {
         super.tick(delta, keyboard);
         this.explosion?.tick(delta, keyboard);
         if (this.explosion?.loops > 0) {
-            this.container.removeChild(this.explosion);
+            this.explosion.destroy();
             delete this.trough.actors[this.id];
         }
 
