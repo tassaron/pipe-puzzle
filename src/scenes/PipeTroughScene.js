@@ -3,6 +3,9 @@ import Scene from "muffin-game/scenes/Scene";
 import { logger } from "../logger";
 
 
+const PIPE_SLIDE_DELAY = 30.0;
+
+
 export default class PipeTroughScene extends Scene {
     subcontainer = new PIXI.Container();
 
@@ -12,7 +15,7 @@ export default class PipeTroughScene extends Scene {
         this.subcontainer.x = 219;
         this.upcomingPipes = [];
         for (let i = 0; i < 5; i++) {
-            this.addPipeToTrough();
+            this.addPipeToTrough(i);
         }
     }
 
@@ -26,16 +29,35 @@ export default class PipeTroughScene extends Scene {
         return nextPipe;
     }
 
-    addPipeToTrough() {
-        const i = 4;
-        const newPipe = this.game.sprites.pipe();
-        const pipeId = this.addActors([newPipe])[0];
-        this.subcontainer.addChild(newPipe);
-        for (let j = 0; j < this.upcomingPipes.length; j++) {
-            this.actors[this.upcomingPipes[j]].x = j * 73;
+    addPipeToTrough(i=4) {
+        const newPipeActor = () => {
+            const newPipe = this.game.sprites.pipe();
+            const pipeId = this.addActors([newPipe])[0];
+            this.subcontainer.addChild(newPipe);
+            newPipe.x = 73 * i;
+            this.upcomingPipes.push(pipeId);
+            logger.info(`Registered new pipe in trough: ${pipeId}`);
         }
-        newPipe.x = 73 * i;
-        logger.info(`Registered new pipe in trough: ${pipeId}`);
-        this.upcomingPipes.push(pipeId);
+        if (i != 4) {
+            newPipeActor();
+            return;
+        }
+
+        // create the new actor after the old ones finish sliding left
+        this.game.startTimer(newPipeActor, PIPE_SLIDE_DELAY, "next pipe appearance");
+        
+        const slideOldPipesTick = (delta, keyboard) => {
+            if (this.actors[this.upcomingPipes[0]].x == 0) {
+                // finished sliding
+                this._beforeTickFuncs = [];
+            }
+            for (let j = 0; j < this.upcomingPipes.length; j++) {
+                this.actors[this.upcomingPipes[j]].x = Math.max(
+                    73 * j,
+                    this.actors[this.upcomingPipes[j]].x - (73 / PIPE_SLIDE_DELAY) * delta
+                );
+            }
+        }
+        this.beforeTick(slideOldPipesTick);
     }
 }
