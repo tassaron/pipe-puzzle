@@ -9,10 +9,13 @@ const PIPE_SLIDE_DELAY = 30.0;
 export default class PipeTroughScene extends Scene {
     subcontainer = new PIXI.Container();
 
+
     constructor(game) {
         super(game);
         this.subcontainer.y = game.height - 73;
         this.subcontainer.x = 219;
+        this.slideOldPipes = null;
+        this.slideOldPipesSpeed = 1;
         this.upcomingPipes = [];
         for (let i = 0; i < 5; i++) {
             this.addPipeToTrough(i);
@@ -46,17 +49,31 @@ export default class PipeTroughScene extends Scene {
         // create the new actor after the old ones finish sliding left
         this.game.startTimer(newPipeActor, PIPE_SLIDE_DELAY, "next pipe appearance");
         
+        if (this.slideOldPipes !== null) {
+            this.slideOldPipesSpeed++;
+            return;
+        }
         const slideOldPipesTick = (delta, keyboard) => {
+            const complete = [];
+            for (let i = 0; i < this.upcomingPipes.length; i++) {
+                complete[i] = false;
+            }
+
             for (let j = 0; j < this.upcomingPipes.length; j++) {
                 this.actors[this.upcomingPipes[j]].x = Math.max(
                     73 * j,
-                    this.actors[this.upcomingPipes[j]].x - (73 / PIPE_SLIDE_DELAY) * delta
+                    this.actors[this.upcomingPipes[j]].x - (73 / PIPE_SLIDE_DELAY) * (delta * this.slideOldPipesSpeed)
                 );
-                if (j - 1 == this.upcomingPipes.length && this.actors[this.upcomingPipes[j]].x == j * 73) {
-                    this.beforeTick.remove(slideOldPipesTick);
+                if (this.actors[this.upcomingPipes[j]].x == j * 73) {
+                    complete[j] = true;
                 }
             }
+            if (complete.every((val) => val == true) && this.upcomingPipes.length == 5) {
+                this.beforeTick.remove(this.slideOldPipes);
+                this.slideOldPipes = null;
+                this.slideOldPipesSpeed = 1;
+            }
         }
-        this.beforeTick.add(slideOldPipesTick);
+        this.slideOldPipes = this.beforeTick.add(slideOldPipesTick);
     }
 }
