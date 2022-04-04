@@ -7,6 +7,9 @@ import MenuScene from "./MenuScene";
 import ButtonActor from "muffin-game/actors/ButtonActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import FfwdButtonActor from "../actors/FfwdButtonActor";
+import ScoreNotifActor from "../actors/ScoreNotifActor";
+import ScoreTextActor from "../actors/ScoreTextActor";
+
 
 const LEVEL_DELAY_TIME = 60.0;
 
@@ -70,6 +73,7 @@ export default class WorldScene extends Scene {
             pipe.pointertap = (e) => {
                 pipe.explode(pipeId, this.trough);
                 placePipe(x, y);
+                this.score = Math.max(this.score - 10, 0);
             };
         };
         
@@ -83,7 +87,7 @@ export default class WorldScene extends Scene {
         this.subscenes = [this.grid, this.trough];
         
         // Create score/level text
-        this.createTextActors();
+        this.createTextActors(false);
         
         // Start the water timer later, before the scene is mounted
         this.beforeMount.add(() => {
@@ -112,8 +116,9 @@ export default class WorldScene extends Scene {
         });
     }
 
-    createTextActors() {
-        this.actors.scoreText = new ButtonActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {}, 0x6d4a82, 0x4e315e);
+    createTextActors(wiggle=true) {
+        this.actors.scoreText = new ScoreTextActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {}, 0x6d4a82, 0x4e315e);
+        if (!wiggle) this.actors.scoreText.direction = 2;
         this.actors.scoreText.x = 125;
         this.actors.scoreText.y = this.game.height - 50;
         this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {}, 0x6d4a82, 0x4e315e);
@@ -121,17 +126,26 @@ export default class WorldScene extends Scene {
         this.actors.levelText.y = this.game.height - 50;
     }
 
+    newScoreNotif(difference) {
+        const id = this.addActors(new ScoreNotifActor(this.game, difference))[0];
+        const actor = this.actors[id];
+        this.actors.scoreText.addChild(actor);
+        actor.x = 0;
+        actor.y = 0;
+    }
+
     tick(delta, keyboard) {
         super.tick(delta, keyboard);
-        if (this.score != this.oldScore || this.level != this.oldLevel) {
-            if (!this.mounted) return;
-            this.mounted.removeChild(this.actors.scoreText);
-            this.mounted.removeChild(this.actors.levelText);
-            this.createTextActors();
-            this.mounted.addChild(this.actors.scoreText);
-            this.mounted.addChild(this.actors.levelText);
+        if (this.mounted == null || (this.score == this.oldScore && this.level == this.oldLevel)) {
+            return;
         }
+        this.actors.scoreText.destroy();
+        this.actors.levelText.destroy();
+        this.createTextActors();
+        this.mounted.addChild(this.actors.scoreText);
+        this.mounted.addChild(this.actors.levelText);
         if (this.score != this.oldScore) {
+            this.newScoreNotif(this.score - this.oldScore);
             this.oldScore = Number(this.score);
         }
         if (this.level != this.oldLevel) {
