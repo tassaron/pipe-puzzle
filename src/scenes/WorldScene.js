@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import { newBackButton } from "muffin-game/scenes/MenuScene";
 import Scene from "muffin-game/scenes/Scene";
 import PipeGridScene from "./PipeGridScene";
@@ -83,13 +84,19 @@ export default class WorldScene extends Scene {
         
         // Create score/level text
         this.createTextActors();
-
+        
         // Start the water timer later, before the scene is mounted
         this.beforeMount.add(() => {
             this.startWaterTimer();
         });
-    }
 
+        // Reset game speed when leaving this scene
+        this.beforeUnmount.add(() => {
+            this.actors.ffwdButton.setGameSpeed(1);
+            logger.info("Reset game speed to 1");
+        });
+    }
+    
     startWaterTimer() {
         const flowDelay = Math.max(LEVEL_DELAY_MAX - (this.level * LEVEL_DELAY_TIME), 0.0);
         this.timer = this.game.startTimer(

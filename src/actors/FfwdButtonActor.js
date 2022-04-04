@@ -1,14 +1,16 @@
 import EllipseActor from "muffin-game/actors/EllipseActor";
 import TriangleActor from "muffin-game/actors/TriangleActor";
 import { playTick } from "muffin-game/core/game";
+import { logger } from "../logger";
 
 
-const FFWD_TICKS = 5;
-
-
-const fasterTick = (game, delta, keyboard) => {
-    for (let i = 0; i < FFWD_TICKS; i++) {
-        playTick(game, delta, keyboard);
+const fasterTick = (ticks) => {
+    // call normal playTick more than once per tick
+    // set this output as `game.state.functions.tick` to speed up the game
+    return (game, delta, keyboard) => {
+        for (let i = 0; i < ticks; i++) {
+            playTick(game, delta, keyboard);
+        }
     }
 }
 
@@ -36,24 +38,34 @@ export default class FfwdButtonActor extends EllipseActor {
             newFfwdButtons(0xff0000),
             newFfwdButtons(0xffffff),
         ]
-        this.toggle();
-        this.game.state.functions.tick = playTick;
+        this.toggleChildren();
+        this.setGameSpeed(1);
     }
-
-    pointertap(e) {
-        this.ffwd = !this.ffwd;
-        this.toggle();
-        if (this.ffwd) {
-            this.game.state.functions.tick = fasterTick;
-        } else {
-            this.game.state.functions.tick = playTick;
-        }
-    }
-
-    toggle() {
+    
+    toggleChildren() {
         this.removeChildren();
         for (let i = 0; i < 2; i++) {
             this.addChild(this.buttons[this.ffwd ? 0 : 1][i]);
         }
     }
+
+    setGameSpeed(speed) {
+        if (speed > 1) {
+            this.game.state.functions.tick = fasterTick(speed);
+        } else {
+            this.game.state.functions.tick = playTick;
+        }
+        logger.info(`Switched game to ${speed}x speed`);
+    }
+
+    pointertap(e) {
+        this.ffwd = !this.ffwd;
+        this.toggleChildren();
+        if (this.ffwd) {
+            this.setGameSpeed(5);
+        } else {
+            this.setGameSpeed(1);
+        }
+    }
+
 }
