@@ -75,10 +75,11 @@ export default class PipeGridScene extends GridScene {
         // It's only behind the grid because non-grid actors are mounted before the grid's actors
         // This is an implementation detail possible to change in a future version of muffin-game
         this.actors.background = new RectangleActor(game, (PipeGridScene.gridSize * 9) + 4, (PipeGridScene.gridSize * 6) + 4, 0xffffff, 0x000000);
-        this.actors.background.x = 35;
-        this.actors.background.y = 28;
-        this.subcontainer.x = 37;
-        this.subcontainer.y = 30;
+        const bgX = 36.5;
+        this.actors.background.x = bgX - (73 / 4);
+        this.actors.background.y = bgX / 2;
+        this.subcontainer.x = (bgX + 2) + (73 / 4);
+        this.subcontainer.y = ((bgX / 2) + 2) + (73/2);
     }
 
     getWaterSourceUnderlyingTile() {
