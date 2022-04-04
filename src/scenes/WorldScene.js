@@ -5,9 +5,11 @@ import PipeTroughScene from "./PipeTroughScene";
 import MenuScene from "./MenuScene";
 import ButtonActor from "muffin-game/actors/ButtonActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
-
+import FfwdButtonActor from "../actors/FfwdButtonActor";
 
 const LEVEL_DELAY_TIME = 60.0;
+
+
 const LEVEL_DELAY_MAX = LEVEL_DELAY_TIME * 10;
 
 
@@ -23,6 +25,14 @@ export default class WorldScene extends Scene {
         this.score = score;
         this.level = level;
         this.actors.backButton = newBackButton(game, MenuScene);
+
+        // Fast-forward button
+        this.actors.ffwdButton = new FfwdButtonActor(game);
+        this.actors.ffwdButton.x = game.width - 36;
+        this.actors.ffwdButton.y = 36;
+        this.actors.ffwdButton.anchor.x = 0.5;
+        this.actors.ffwdButton.anchor.y = 0.5;
+        this.actors.ffwdButton.interactive = true;
         
         // Create subscenes
         this.grid = new PipeGridScene(game);
