@@ -43,10 +43,10 @@ export default class WaterSourceTileActor extends RectangleActor {
             let flowIndicator;
             if (this.direction < 2) {
                 // vertical
-                flowIndicator = new RectangleActor(game, 4, 73, 0x000000, null);
+                flowIndicator = new RectangleActor(game, 4, 73, 0x3366aa, null);
             } else {
                 // horizontal
-                flowIndicator = new RectangleActor(game, 73, 4, 0x000000, null);
+                flowIndicator = new RectangleActor(game, 73, 4, 0x3366aa, null);
             }
             this.addChild(flowIndicator);
             switch(this.direction) {
