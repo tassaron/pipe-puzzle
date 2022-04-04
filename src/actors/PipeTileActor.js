@@ -96,7 +96,7 @@ export default class PipeTileActor extends TileActor {
         this.explosion = this.game.sprites.explosion();
         this.container.addChild(this.explosion);
         this.explosion.x = (this.gridy + 1) * PipeGridScene.gridSize + (PipeGridScene.gridSize / 2) - 32;
-        this.explosion.y = (this.gridx + 1) * PipeGridScene.gridSize;// + (PipeGridScene.gridSize / 2);
+        this.explosion.y = (this.gridx + 1) * PipeGridScene.gridSize;
         this.explosion.scale.x = 2.0;
         this.explosion.scale.y = 2.0;
     }
