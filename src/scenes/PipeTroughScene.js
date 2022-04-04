@@ -32,7 +32,9 @@ export default class PipeTroughScene extends Scene {
         return nextPipe;
     }
 
-    addPipeToTrough(i=4) {
+    addPipeToTrough(i) {
+        const firstRun = i !== undefined;
+        i = i === undefined ? 4 : i;
         const newPipeActor = () => {
             const newPipe = this.game.sprites.pipe();
             const pipeId = this.addActors([newPipe])[0];
@@ -40,8 +42,15 @@ export default class PipeTroughScene extends Scene {
             newPipe.x = 73 * i;
             this.upcomingPipes.push(pipeId);
             logger.info(`Registered new pipe in trough: ${pipeId}`);
+            if (firstRun) return;
+            newPipe.alpha = 0.0;
+            const fadeInNewPipe = (delta, keyboard) => {
+                newPipe.alpha = Math.min(newPipe.alpha + (delta / 10), 1.0);
+                if (newPipe.alpha == 1.0) this.beforeTick.remove(fadeInNewPipe);
+            }
+            this.beforeTick.add(fadeInNewPipe);
         }
-        if (i != 4) {
+        if (firstRun || i != 4) {
             newPipeActor();
             return;
         }
