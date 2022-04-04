@@ -139,16 +139,22 @@ export default class PipeGridScene extends GridScene {
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
         pipe.interactive = false;
-        const waterPipe = new Actor(this.game, pipe.texture);
+        let firstWaterPipe = null;
+        if (pipe.tint !== 0x2377ff) {
+            // Make original pipe blue and add another pipe on top to hide it
+            pipe.tint = 0x2377ff;
+            // we'll reduce the opacity of firstWaterPipe over time
+            firstWaterPipe = new Actor(this.game, pipe.texture);
+            pipe.parent.addChild(firstWaterPipe)
+        }
+        // Another blue pipe is blended on top for highlight
         const waterHighlightPipe = new Actor(this.game, pipe.texture);
         waterHighlightPipe.alpha = 0.0;
         waterHighlightPipe.tint = 0x2377ff;
         waterHighlightPipe.blendMode = PIXI.BLEND_MODES.ADD;
-        pipe.tint = 0x2377ff;
-        pipe.parent.addChild(waterPipe)
         pipe.parent.addChild(waterHighlightPipe);
         const waterAnimate = (delta, keyboard) => {
-            waterPipe.alpha -= delta / FLOW_DELAY;
+            if (firstWaterPipe) firstWaterPipe.alpha -= delta / FLOW_DELAY;
             waterHighlightPipe.alpha += delta / FLOW_DELAY;
         }
         const result = this.beforeTick.add(waterAnimate);
