@@ -61,6 +61,7 @@ export default class WorldScene extends Scene {
             } else {
                 this.grid[y][x].addChild(pipe);
             }
+            this.grid[y][x].wiggle();
             // The EmptyPipeTileActor is no longer clickable
             this.grid[y][x].interactive = false;
             // The PipeTileActor's x and y is relative to the parent
@@ -118,7 +119,7 @@ export default class WorldScene extends Scene {
 
     createTextActors(wiggle=true) {
         this.actors.scoreText = new ScoreTextActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {}, 0x6d4a82, 0x4e315e);
-        if (!wiggle) this.actors.scoreText.direction = 2;
+        if (!wiggle) this.actors.scoreText.wiggle.direction = 2;
         this.actors.scoreText.x = 125;
         this.actors.scoreText.y = this.game.height - 50;
         this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {}, 0x6d4a82, 0x4e315e);
