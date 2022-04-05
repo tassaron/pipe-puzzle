@@ -7,7 +7,7 @@ export default class EmptyPipeTileActor extends RectangleActor {
         super(game, 73, 73, 0xffffff, 0xafc3de);
         this.gridx = x;
         this.gridy = y;
-        this._wiggle = new WiggleAction(game, this, 2);
+        this._wiggle = new WiggleAction(this, 2);
         this._wiggle.direction = 2;
         this.pivot.x = 73 / 2;
         this.pivot.y = 73 / 2;

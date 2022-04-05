@@ -5,7 +5,7 @@ import WiggleAction from "muffin-game/actors/actions/WiggleAction";
 export default class ScoreTextActor extends ButtonActor {
     constructor(game, ...args) {
         super(game, ...args);
-        this.wiggle = new WiggleAction(game, this, 5);
+        this.wiggle = new WiggleAction(this, 5);
     }
 
     tick(delta, keyboard) {
