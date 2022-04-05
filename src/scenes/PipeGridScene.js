@@ -4,6 +4,7 @@ import WaterSourceTileActor, { getDirectionCoords, waterDirections } from "../ac
 import Actor from "muffin-game/actors/Actor";
 import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
+import TriangleActor from  "muffin-game/actors/TriangleActor";
 import GridScene from "muffin-game/grids/GridScene";
 import { logger } from "../logger";
 
@@ -92,7 +93,13 @@ export default class PipeGridScene extends GridScene {
     }
 
     getWaterSourceTile() {
+        const tile = this.getWaterSourceUnderlyingTile().children[0];
+        if (tile === undefined) logger.error("WaterSourceTile does not exist");
         return this.getWaterSourceUnderlyingTile().children[0];
+    }
+
+    startWaterTimer(flowDelay) {
+        this.getWaterSourceTile().startTimer(flowDelay);
     }
 
     startWater() {
@@ -134,7 +141,11 @@ export default class PipeGridScene extends GridScene {
             this.game.gameOver();
             return;
         }
-        this.game.scene.score += 100;
+        if (this.game.scene.actors.ffwdButton.ffwd) {
+            this.game.scene.score += 250;
+        } else {
+            this.game.scene.score += 100;
+        }
 
         // Draw the water flowing
         const pipe = this._grid[x][y].children[0];
@@ -146,6 +157,9 @@ export default class PipeGridScene extends GridScene {
             // we'll reduce the opacity of firstWaterPipe over time
             firstWaterPipe = new Actor(this.game, pipe.texture);
             pipe.parent.addChild(firstWaterPipe)
+        } else {
+            // award extra points for crossing an intersection twice
+            this.game.scene.score += 100;
         }
         // Another blue pipe is blended on top for highlight
         const waterHighlightPipe = new Actor(this.game, pipe.texture);
@@ -216,6 +230,7 @@ export default class PipeGridScene extends GridScene {
     }
 
     placeDestinationLine(y, x) {
+        // First add white line to cover the outline of the grid
         let flowIndicator;
         if (y == 0 || y == PipeGridScene.rows - 1) {
             // vertical
@@ -234,5 +249,21 @@ export default class PipeGridScene extends GridScene {
         } else if (x == PipeGridScene.cols - 1) {
             flowIndicator.y = 73 - 4;
         }
+
+        // Then add little arrow pointing off the grid
+        const arrow = new TriangleActor(this.game, 16, 16, 0x000000, null);
+        arrow.pivot.x = 8;
+        arrow.pivot.y = 8;
+        flowIndicator.addChild(arrow);
+        // x and y are still backwards
+        if (x == 0) {
+            arrow.angle = 180;
+        } else if (y == 0) {
+            arrow.angle = 90;
+        } else if (y == PipeGridScene.rows - 1) {
+            arrow.angle = 270;
+        }
+        arrow.x = flowIndicator.width / 2;
+        arrow.y = flowIndicator.height / 2;
     }
 }

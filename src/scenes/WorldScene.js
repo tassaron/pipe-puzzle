@@ -74,7 +74,7 @@ export default class WorldScene extends Scene {
             pipe.pointertap = (e) => {
                 pipe.explode(pipeId, this.trough);
                 placePipe(x, y);
-                this.score = Math.max(this.score - 10, 0);
+                this.score = Math.max(this.score - 100, 0);
             };
         };
         
@@ -112,6 +112,7 @@ export default class WorldScene extends Scene {
             flowDelay,
             "initial flow grow"
         );
+        this.grid.beforeMount.add(() => this.grid.startWaterTimer(flowDelay));
         this.beforeUnmount.add(() => {
             if (this.timer > -1) this.game.stopTimer(this.timer)
         });
