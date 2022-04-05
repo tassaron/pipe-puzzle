@@ -16,27 +16,30 @@ export default class MenuScene extends Scene {
     constructor(game, options) {
         super(game, options);
         
-        // Make a stationary rotating pipe
-        this.actors.pipe = game.sprites.decoration();
-        this.actors.pipe.x = game.width / 2;
-        this.actors.pipe.y = (game.height - this.actors.pipe.height) - 50;
-        this.actors.pipe.anchor.x = 0.5;
-        this.actors.pipe.anchor.y = 0.5;
+        // Make 3 stationary rotating pipes
+        let pipe;
+        for (let i = -300; i < 500; i += 200) {
+            pipe = game.sprites.decoration();
+            pipe.x = (game.width / 2) + i;
+            pipe.y = (game.height - pipe.height) - 50;
+            pipe.anchor.x = 0.5;
+            pipe.anchor.y = 0.5;
+            this.bouncers.push(pipe);
+        }
         
         // Make some pipes that will bounce around
         let bouncer;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 5; i++) {
             bouncer = game.sprites.decoration();
             bouncer.dx = Math.min(0.5, Math.random() + 0.2);
             bouncer.dy = Math.max(-1.0, Math.random() - 0.2);
-            bouncer.x = 330 + (76 * i);
+            bouncer.x = 200 + (76 * i);
             bouncer.y = 90;
             bouncer.anchor.x = 0.5;
             bouncer.anchor.y = 0.5;
             this.bouncers.push(bouncer);
         }
         this.addActors(this.bouncers);
-        this.bouncers.push(this.actors.pipe);
 
         addNewMenuButtonsToScene(this);
         this.buttons[0].y -= 25;
@@ -61,12 +64,12 @@ export default class MenuScene extends Scene {
                 collisions.add([i, j]);
                 if (this.bouncers[i].collision.collides(this.bouncers[j].collision)) {
                     if (this.bouncers[j].dx == 0.0) {
-                        this.bouncers[j].dx = this.bouncers[i].dx;
-                        this.bouncers[j].dy = this.bouncers[i].dy;
-                        continue;
+                        this.bouncers[j].dx = Number(this.bouncers[i].dx);
+                        this.bouncers[j].dy = Number(this.bouncers[i].dy);
                     }
                     this.bouncers[i].dx = -this.bouncers[i].dx;
                     this.bouncers[i].dy = -this.bouncers[i].dy;
+                    if (this.bouncers[i].collision.overlap < -82) this.bouncers[i].explode(i);
                 }
             }
         }

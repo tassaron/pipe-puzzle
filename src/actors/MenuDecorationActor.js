@@ -1,4 +1,4 @@
-import CollisionAction from "muffin-game/actors/actions/CollisionAction";
+import EllipseCollisionAction from "muffin-game/actors/actions/EllipseCollisionAction";
 import PipeTileActor from "../actors/PipeTileActor";
 
 
@@ -8,23 +8,48 @@ export default class MenuDecorationActor extends PipeTileActor {
 
     constructor(...args) {
         super(...args);
-        this.collision = new CollisionAction(this);
+        this.collision = new EllipseCollisionAction(this);
     }
 
     tick(delta, keyboard) {
         super.tick(delta, keyboard);
-        if (this.x < 0.0) {
+        if ((this.x - 36) < 0.0) {
             this.dx = Math.abs(this.dx);
-        } else if (this.x + this.width > this.game.width) {
+        } else if ((this.x - 36) + this.width > this.game.width) {
             this.dx = Math.abs(this.dx) * -1;
         }
         this.x += this.dx * delta;
 
-        if (this.y < 0.0) {
+        if ((this.y - 36) < 0.0) {
             this.dy = Math.abs(this.dy);
-        } else if (this.y + this.height > this.game.height) {
+        } else if ((this.y - 36) + this.height > this.game.height) {
             this.dy = Math.abs(this.dy) * -1;
         }
         this.y += this.dy * delta;
+        if (this.children.length > 0) {
+            const boom = this.children[0];
+            boom.tick(delta, keyboard);
+            this.alpha -= delta / 30;
+            if (boom.loops > 0) {
+                // Toss it off-canvas and leave it there
+                this.tick = () => {};
+                this.dx = 0.0;
+                this.dy = 0.0;
+                this.x = -100;
+                this.y = -100;
+            }
+        }
+    }
+
+    explode(i) {
+        if (this.children.length == 0) {
+            const boom = this.game.sprites.explosion();
+            boom.index = i;
+            boom.scale.x = 2.0;
+            boom.scale.y = 2.0;
+            boom.anchor.x = 0.5;
+            boom.anchor.y = 0.5;
+            this.addChild(boom);
+        }
     }
 }
