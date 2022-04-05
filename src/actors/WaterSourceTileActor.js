@@ -1,6 +1,7 @@
+import * as PIXI from "pixi.js";
 import { logger } from "../logger";
 import RectangleActor from "muffin-game/actors/RectangleActor";
-import EllipseActor from "muffin-game/actors/EllipseActor";
+import TriangleActor from "muffin-game/actors/TriangleActor";
 
 
 export const randomDirection = () => Math.floor(Math.random() * 4);
@@ -23,7 +24,7 @@ export default class WaterSourceTileActor extends RectangleActor {
     direction = randomDirection();
 
     constructor(game, coords, maxY, maxX) {
-        super(game, 73, 73, 0x000000, 0xffffff);
+        super(game, 73, 73, 0x333333, 0xffffff);
 
         const [y, x] = coords;
         this.gridy = y;
@@ -43,10 +44,10 @@ export default class WaterSourceTileActor extends RectangleActor {
             let flowIndicator;
             if (this.direction < 2) {
                 // vertical
-                flowIndicator = new RectangleActor(game, 4, 73, 0x3366aa, null);
+                flowIndicator = new RectangleActor(game, 4, 73, 0xafc3de, null);
             } else {
                 // horizontal
-                flowIndicator = new RectangleActor(game, 73, 4, 0x3366aa, null);
+                flowIndicator = new RectangleActor(game, 73, 4, 0xafc3de, null);
             }
             this.addChild(flowIndicator);
             switch(this.direction) {
@@ -61,10 +62,35 @@ export default class WaterSourceTileActor extends RectangleActor {
             }
         };
         this.flowIndicator = createFlowIndicator();
+
+        // Then add little arrow for extra emphasis
+        const arrow = new TriangleActor(this.game, 16, 16, 0x2187d9, null);
+        arrow.pivot.x = 8;
+        arrow.pivot.y = 8;
+        this.children[0].addChild(arrow);
+        if (this.direction == 0) {
+            // left
+            arrow.angle = 90;
+        } else if (this.direction == 1) {
+            // right
+            arrow.angle = 270;
+        } else if (this.direction == 3) {
+            // up
+            arrow.angle = 180;
+        }
+        if (this.direction < 2) {
+            arrow.y = this.children[0].height / 2;
+            arrow.x = this.direction == 0 ? 8 : -8;
+        } else {
+            arrow.y = this.direction == 3 ? 8 : -8;
+            arrow.x = this.children[0].width / 2;
+        }
     }
 
-    startFlowAnimation() {
-        this.flowAnimation = new EllipseActor(this.game, 1, 1, 0x2187d9, null);
+    startFlowAnimation(delay) {
+        this.flowAnimation = new RectangleActor(this.game, 72, 72, 0x2187d9, null);
+        this.flowAnimation.width = 0;
+        this.flowAnimation.height = 0;
         this.addChild(this.flowAnimation);
         this.flowAnimation.x = 73 / 2;
         this.flowAnimation.y = 73 / 2;
@@ -75,6 +101,39 @@ export default class WaterSourceTileActor extends RectangleActor {
             this.flowAnimation.width += delta / 4;
             this.flowAnimation.height += delta / 4;
         });
+    }
+
+    startTimer(delay) {
+        // Add text to display seconds remaining
+        const newTimeText = (niceTime) => {
+            const text = new PIXI.Text(`${niceTime}`, new PIXI.TextStyle({fill: 0xffffff, fontSize: 24}));
+            text.anchor.x = 0.5;
+            text.anchor.y = 0.5;
+            text.x = 73 / 2;
+            text.y = 73 / 2;
+            return text;
+        }
+        
+        let currTime;
+        let niceTime = Math.ceil(delay / 60);
+        logger.info(`Starting waterSource's textual timer at ${niceTime}`);
+        let text = newTimeText(niceTime);
+        this.addChild(text);
+
+        const tickDownTimer = (delta, keyboard) => {
+            delay -= delta;
+            currTime = Math.ceil(delay / 60);
+            if (currTime == niceTime) return;
+            niceTime = currTime;
+            this.removeChild(text);
+            if (niceTime < 0) {
+                this.game.scene.beforeTick.remove(tickDownTimer);
+                return;
+            }
+            text = newTimeText(niceTime);
+            this.addChild(text);
+        }
+        this.game.scene.beforeTick.add(tickDownTimer);
     }
 
     stopFlowAnimation() {
