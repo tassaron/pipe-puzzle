@@ -119,11 +119,11 @@ export default class WorldScene extends Scene {
     }
 
     createTextActors(wiggle=true) {
-        this.actors.scoreText = new ScoreTextActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {}, 0x6d4a82, 0x4e315e);
+        this.actors.scoreText = new ScoreTextActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {fill: 0xffffff}, 0x6d4a82, 0x4e315e);
         if (!wiggle) this.actors.scoreText.wiggle.direction = 2;
         this.actors.scoreText.x = 125;
         this.actors.scoreText.y = this.game.height - 50;
-        this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {}, 0x6d4a82, 0x4e315e);
+        this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {fill: 0xffffff}, 0x6d4a82, 0x4e315e);
         this.actors.levelText.x = this.game.width - 125;
         this.actors.levelText.y = this.game.height - 50;
     }
