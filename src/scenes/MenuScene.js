@@ -44,7 +44,7 @@ export default class MenuScene extends Scene {
         addNewMenuButtonsToScene(this);
         this.buttons[0].y -= 25;
         
-        this.actors.titleText = new ButtonActor(game, RectangleActor, 550, 125, "Pipe Puzzle", {color: 0xffffff, fontSize: "96px"}, 0x6d4a82, 0x4e315e);
+        this.actors.titleText = new ButtonActor(game, RectangleActor, 550, 125, "Pipe Puzzle", {fill: 0xffffff, fontSize: "96px"}, 0x6d4a82, 0x4e315e);
         this.actors.titleText.y = 100;
         this.actors.titleText.x = game.width / 2;
         this.actors.titleText.anchor.x = 0.5;
