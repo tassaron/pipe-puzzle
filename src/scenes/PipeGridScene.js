@@ -6,6 +6,7 @@ import EmptyPipeTileActor from "../actors/EmptyPipeTileActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
 import TriangleActor from  "muffin-game/actors/TriangleActor";
 import GridScene from "muffin-game/grids/GridScene";
+import WaterSpillActor from "../actors/WaterSpillActor";
 import { logger } from "../logger";
 
 
@@ -136,9 +137,10 @@ export default class PipeGridScene extends GridScene {
         logger.info(`Looking at x${x},y${y} for the next pipe!`);
         if (
             this._grid[x][y].children.length == 0 ||
+            !("waterCanFlow" in this._grid[x][y].children[0]) ||
             !this._grid[x][y].children[0].waterCanFlow(direction)
                 ) {
-            this.game.gameOver();
+            this.gameOver(x, y, direction);
             return;
         }
         if (this.game.scene.actors.ffwdButton.ffwd) {
@@ -211,7 +213,7 @@ export default class PipeGridScene extends GridScene {
             } else {
                 logger.info("Waiting to die (good song by The Grammar Club btw)")
                 this.game.startTimer(() => {
-                    this.mounted && this.game.gameOver();
+                    this.mounted && this.gameOver(newx, newy, direction);
                 }, FLOW_DELAY, "gonna die");
                 return;
             }
@@ -265,5 +267,33 @@ export default class PipeGridScene extends GridScene {
         }
         arrow.x = flowIndicator.width / 2;
         arrow.y = flowIndicator.height / 2;
+    }
+
+    gameOver(x, y, direction) {
+        const waterSpill = new WaterSpillActor(this.game);
+        waterSpill.y = y * 73;
+        waterSpill.x = x * 73;
+        logger.info(`Water spill at x${x}, y${y} - ${waterDirections[direction]}`)
+        switch (direction) {
+            case waterDirections.left:
+                waterSpill.x += 73 + 32;
+                waterSpill.y += 73 - 16;
+                break;
+            case waterDirections.right:
+                waterSpill.x += 16;
+                waterSpill.y += 73 - 16;
+                break;
+            case waterDirections.up:
+                waterSpill.x += 73 - 16;
+                waterSpill.y += 73 + 16;
+                break;
+            case waterDirections.down:
+                waterSpill.x += 73 - 16;
+                waterSpill.y += 16;
+        }
+        waterSpill.x += this.subcontainer.x;
+        waterSpill.y += this.subcontainer.y;
+        this.actors.waterSpill = waterSpill;
+        this.game.gameOver();
     }
 }
