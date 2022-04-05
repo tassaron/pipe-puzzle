@@ -19,7 +19,7 @@ export default class FfwdButtonActor extends EllipseActor {
     ffwd = false;
 
     constructor(game) {
-        super(game, 28, 28, 0x000000, null);
+        super(game, 28, 28, 0x000000, 0xffffff);
         this.buttonMode = true;
         this.accessible = true;
         this.accessibleTitle = "⏩";
