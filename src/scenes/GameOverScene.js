@@ -3,6 +3,7 @@ import RectangleActor from "muffin-game/actors/RectangleActor";
 import ButtonActor from "muffin-game/actors/ButtonActor";
 import { Pauser } from "muffin-game/scenes/PauseScene";
 import { gameOverTick as nothingTick } from "muffin-game/core/game";
+import { show_send_score_button, hide_send_score_button } from "../compat.rainey_arcade.js";
 
 
 export default class GameOverScene extends Scene {
@@ -38,6 +39,7 @@ export default class GameOverScene extends Scene {
 
     unmount(container) {
         this.pauser?.unpause();
+        hide_send_score_button();
         super.unmount(container);
     }
 }
@@ -46,5 +48,8 @@ export default class GameOverScene extends Scene {
 function gameOverTick(game, delta, keyboard) {
     game.scene.actors.text.alpha = Math.min(game.scene.actors.text.alpha + (delta / 60), 1.0);
     game.scene.actors.waterSpill.tick(delta, keyboard);
-    if (game.scene.actors.text.alpha == 1.0) game.state.functions.tick = nothingTick;
+    if (game.scene.actors.text.alpha == 1.0) {
+        show_send_score_button(game.prevScene.score);
+        game.state.functions.tick = nothingTick;
+    }
 }

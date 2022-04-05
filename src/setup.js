@@ -30,4 +30,4 @@ function afterPreload(loader, resources, sprites) {
 };
 
 
-createGame(textures, afterPreload);
+createGame(textures, afterPreload, {assetPrefix: "/static/client/rainey_arcade/js/pipe-puzzle/assets/"});
