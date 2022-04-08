@@ -22,8 +22,8 @@ export default class GameOverScene extends Scene {
         this.actors.text.alpha = 0.0;
 
         this.beforeMount.add(() => {
-            this.actors.text.x = game.width(100) / 2;
-            this.actors.text.y = game.height(100) / 2;
+            this.actors.text.x = game.width(50);
+            this.actors.text.y = game.height(50);
         });
 
         this.game.state.functions.tick = gameOverTick;
