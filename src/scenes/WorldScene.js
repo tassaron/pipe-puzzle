@@ -154,4 +154,6 @@ export default class WorldScene extends Scene {
             this.oldLevel = Number(this.level);
         }
     }
+
+    resize(){}
 }
