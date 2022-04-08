@@ -20,7 +20,6 @@ const LEVEL_DELAY_MAX = LEVEL_DELAY_TIME * 10;
 export default class WorldScene extends Scene {
     score = 0;
     level = 0;
-    timer = -1;
     oldScore = 0;
     oldLevel = 0;
     
@@ -32,7 +31,7 @@ export default class WorldScene extends Scene {
 
         // Fast-forward button
         this.actors.ffwdButton = new FfwdButtonActor(game);
-        this.actors.ffwdButton.x = game.width - 36;
+        this.actors.ffwdButton.x = game.width(100) - 36;
         this.actors.ffwdButton.y = 36;
         this.actors.ffwdButton.anchor.x = 0.5;
         this.actors.ffwdButton.anchor.y = 0.5;
@@ -104,28 +103,24 @@ export default class WorldScene extends Scene {
     
     startWaterTimer() {
         const flowDelay = Math.max(LEVEL_DELAY_MAX - (this.level * LEVEL_DELAY_TIME), 0.0);
-        this.timer = this.game.startTimer(
+        this.game.startTimer(
             () => {
-                this.grid.startWater();
-                this.timer = -1;
+                if (this.mounted) this.grid.startWater();
             },
             flowDelay,
             "initial flow grow"
         );
         this.grid.beforeMount.add(() => this.grid.startWaterTimer(flowDelay));
-        this.beforeUnmount.add(() => {
-            if (this.timer > -1) this.game.stopTimer(this.timer)
-        });
     }
 
     createTextActors(wiggle=true) {
         this.actors.scoreText = new ScoreTextActor(this.game, RectangleActor, 175, 50, `Score: ${this.score}`, {fill: 0xffffff}, 0x6d4a82, 0x4e315e);
         if (!wiggle) this.actors.scoreText.wiggle.direction = 2;
         this.actors.scoreText.x = 125;
-        this.actors.scoreText.y = this.game.height - 50;
+        this.actors.scoreText.y = this.game.height(100) - 50;
         this.actors.levelText = new ButtonActor(this.game, RectangleActor, 175, 50, `Level: ${this.level + 1}`, {fill: 0xffffff}, 0x6d4a82, 0x4e315e);
-        this.actors.levelText.x = this.game.width - 125;
-        this.actors.levelText.y = this.game.height - 50;
+        this.actors.levelText.x = this.game.width(100) - 125;
+        this.actors.levelText.y = this.game.height(100) - 50;
     }
 
     newScoreNotif(difference) {

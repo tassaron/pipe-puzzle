@@ -20,8 +20,8 @@ export default class MenuScene extends Scene {
         let pipe;
         for (let i = -300; i < 500; i += 200) {
             pipe = game.sprites.decoration();
-            pipe.x = (game.width / 2) + i;
-            pipe.y = (game.height - pipe.height) - 50;
+            pipe.x = (game.width(100) / 2) + i;
+            pipe.y = (game.height(100) - pipe.height) - 50;
             pipe.anchor.x = 0.5;
             pipe.anchor.y = 0.5;
             this.bouncers.push(pipe);
@@ -48,7 +48,7 @@ export default class MenuScene extends Scene {
         this.beforeMount.add(() => {
             this.buttons[0].y -= 25;
             this.actors.titleText.y = 100;
-            this.actors.titleText.x = this.game.width / 2;
+            this.actors.titleText.x = this.game.width(100) / 2;
         });
     }
     

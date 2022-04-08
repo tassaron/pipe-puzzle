@@ -15,14 +15,14 @@ export default class MenuDecorationActor extends PipeTileActor {
         super.tick(delta, keyboard);
         if ((this.x - 36) < 0.0) {
             this.dx = Math.abs(this.dx);
-        } else if ((this.x - 36) + this.width > this.game.width) {
+        } else if ((this.x - 36) + this.width > this.game.width(100)) {
             this.dx = Math.abs(this.dx) * -1;
         }
         this.x += this.dx * delta;
 
         if ((this.y - 36) < 0.0) {
             this.dy = Math.abs(this.dy);
-        } else if ((this.y - 36) + this.height > this.game.height) {
+        } else if ((this.y - 36) + this.height > this.game.height(100)) {
             this.dy = Math.abs(this.dy) * -1;
         }
         this.y += this.dy * delta;

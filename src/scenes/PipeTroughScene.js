@@ -12,7 +12,7 @@ export default class PipeTroughScene extends Scene {
 
     constructor(game) {
         super(game);
-        this.subcontainer.y = game.height - 73;
+        this.subcontainer.y = game.height(100) - 73;
         this.subcontainer.x = 219;
         this.slideOldPipes = null;
         this.slideOldPipesSpeed = 1;
