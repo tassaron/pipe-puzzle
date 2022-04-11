@@ -3,6 +3,7 @@ import { newBackButton } from "muffin-game/scenes/MenuScene";
 import Scene from "muffin-game/scenes/Scene";
 import PipeGridScene from "./PipeGridScene";
 import PipeTroughScene from "./PipeTroughScene";
+import { SceneChangingModalPopupScene } from "muffin-game/examples/ModalScene";
 import MenuScene from "./MenuScene";
 import ButtonActor from "muffin-game/actors/ButtonActor";
 import RectangleActor from "muffin-game/actors/RectangleActor";
@@ -27,7 +28,15 @@ export default class WorldScene extends Scene {
         super(game);
         this.score = score;
         this.level = level;
-        this.actors.backButton = newBackButton(game, MenuScene);
+        this.actors.backButton = newBackButton(
+            game,
+            (game) => new SceneChangingModalPopupScene(
+                game,
+                (game) => new MenuScene(game),
+                game.width(70),
+                game.height(60),
+            )
+        );
 
         // Fast-forward button
         this.actors.ffwdButton = new FfwdButtonActor(game);
