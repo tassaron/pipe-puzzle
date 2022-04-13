@@ -42,20 +42,19 @@ let then;
 export function show_send_score_button(score) {
     // If embedded on Rainey Arcade, integrate with the send_score_button
     const send_score_button = document.getElementById("send_score_button");
-    if (send_score_button) {
-        function sendScore(e) {
-            send_score(
-                document.getElementById("game_title").dataset.filename,
-                score,
-                send_score_button.dataset.csrfToken,
-            );
-            e.currentTarget.setAttribute("style", "display: none;");
-            e.currentTarget.removeEventListener("click", sendScore);
-            e.stopPropagation();
-        }
-        send_score_button.setAttribute("style", "z-index: 100; display: block; left: 50%; bottom: 25%; transform: translate(-50%);");
-        send_score_button.addEventListener("click", sendScore);
+    if (!send_score_button) return;
+    function sendScore(e) {
+        send_score(
+            document.getElementById("game_title").dataset.filename,
+            score,
+            send_score_button.dataset.csrfToken,
+        );
+        e.currentTarget.setAttribute("style", "display: none;");
+        e.currentTarget.removeEventListener("click", sendScore);
+        e.stopPropagation();
     }
+    send_score_button.setAttribute("style", "z-index: 100; display: block; left: 50%; bottom: 25%; transform: translate(-50%);");
+    send_score_button.addEventListener("click", sendScore);
 }
 
 
@@ -138,6 +137,7 @@ export const send_score = function(filename, score, token) {
 
 export const hide_send_score_button = function() {
     const send_score_button = document.getElementById("send_score_button");
+    if (!send_score_button) return;
     send_score_button.setAttribute("style", "display: none;");
 
     // Remove event listeners by cloning the button
