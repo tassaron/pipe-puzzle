@@ -18,7 +18,7 @@ export default class GameOverScene extends Scene {
         this.actors.text.anchor.x = 0.5;
         this.actors.text.anchor.y = 0.5;
         this.actors.text.interactive = true;
-        this.actors.text.pointertap = (_) => game.reset();
+        this.actors.text.onTap((_) => game.reset());
         this.actors.text.alpha = 0.0;
 
         this.beforeMount.add(() => {

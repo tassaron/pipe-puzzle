@@ -79,18 +79,18 @@ export default class WorldScene extends Scene {
             pipe.gridy = y;
             // Now the player can click the PipeTileActor to destroy it
             pipe.interactive = true;
-            pipe.pointertap = (e) => {
+            pipe.onTap((e) => {
                 pipe.explode(pipeId, this.trough);
                 placePipe(x, y);
                 this.score = Math.max(this.score - 100, 0);
-            };
+            });
         };
         
         // Add click/tap events to all grid tiles (the `EmptyPipeTileActor`s)
         for (let x = 0; x < this.grid.cols; x++) {
             for (let y = 0; y < this.grid.rows; y++) {
                 this.grid[y][x].interactive = true;
-                this.grid[y][x].pointertap = (e) => placePipe(x, y);
+                this.grid[y][x].onTap((e) => placePipe(x, y));
             }
         }
         this.subscenes = [this.grid, this.trough];
