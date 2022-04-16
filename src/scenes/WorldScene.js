@@ -19,15 +19,12 @@ const LEVEL_DELAY_MAX = LEVEL_DELAY_TIME * 10;
 
 
 export default class WorldScene extends Scene {
-    score = 0;
-    level = 0;
-    oldScore = 0;
-    oldLevel = 0;
-    
     constructor(game, score = 0, level = 0) {
         super(game);
         this.score = score;
         this.level = level;
+        this.oldScore = score;
+        this.oldLevel = level;
         this.actors.backButton = newBackButton(
             game,
             (game) => new SceneChangingModalPopupScene(
